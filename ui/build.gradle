@@ -10,9 +10,7 @@ sourceCompatibility = JavaVersion.VERSION_11
 
 dependencies {
     implementation castle()
-    implementation javabeans()
     implementation slf4jApi()
-    implementation ntcore()
     implementation controlfx()
 
     testImplementation junit()
@@ -36,8 +34,8 @@ javafx {
 }
 
 application {
-    mainClassName = 'flashboard.main/com.flash3388.flashboard.Main'
-    applicationName = 'Flashboard'
+    mainClassName = 'driverstation.main/com.flash3388.frc.ds.Main'
+    applicationName = 'JDriverStation'
 }
 
 startScripts {

@@ -1,0 +1,16 @@
+allprojects {
+    apply from: rootProject.file('extras.gradle')
+
+    group GROUP
+    version VERSION
+
+    repositories {
+        mavenCentral()
+        maven {
+            url('https://oss.sonatype.org/content/repositories/snapshots')
+        }
+        maven {
+            url('http://first.wpi.edu/FRC/roborio/maven/release')
+        }
+    }
+}
