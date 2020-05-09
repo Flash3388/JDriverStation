@@ -10,7 +10,7 @@ public class CpuStatus {
         mUsage = usage;
     }
 
-    public ObservableDoubleValue usageValue() {
+    public ObservableDoubleValue usageProperty() {
         return mUsage;
     }
 }

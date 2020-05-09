@@ -1,4 +1,4 @@
-package com.flash3388.frc.ds.control;
+package com.flash3388.frc.ds.robot;
 
 import com.flash3388.frc.ds.util.Strings;
 

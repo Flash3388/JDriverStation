@@ -13,11 +13,11 @@ public class BatteryStatus {
         mIsCharging = isCharging;
     }
 
-    public ObservableDoubleValue levelValue() {
+    public ObservableDoubleValue levelProperty() {
         return mLevel;
     }
 
-    public ObservableBooleanValue isChargingValue() {
+    public ObservableBooleanValue isChargingProperty() {
         return mIsCharging;
     }
 }

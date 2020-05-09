@@ -1,6 +1,7 @@
 package com.flash3388.frc.ds.ui.section;
 
 import com.flash3388.frc.ds.DependencyHolder;
+import com.flash3388.frc.ds.ui.view.ConnectionStatusView;
 import com.flash3388.frc.ds.ui.view.MasterControlView;
 import javafx.stage.Stage;
 
@@ -21,18 +22,19 @@ public class ControlSection extends TabbedPane {
                         dependencyHolder.getBatteryStatus(), dependencyHolder.getCpuStatus(),
                         dependencyHolder.getImageLoader());
             }
-        }/*,
+        },
         CONNECTION_STATUS {
             @Override
             public String displayName() {
-                return null;
+                return "Connection";
             }
 
             @Override
-            public ViewController createController() {
-                return null;
+            public ViewController createController(Stage owner, DependencyHolder dependencyHolder) {
+                return new ConnectionStatusView(dependencyHolder.getRobotStatus(), dependencyHolder.getConnectionStatus(),
+                        dependencyHolder.getRobotControl());
             }
-        }*/
+        }
         ;
     }
 

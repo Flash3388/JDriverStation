@@ -2,11 +2,10 @@ package com.flash3388.frc.ds.ui.view;
 
 import com.flash3388.frc.ds.computer.BatteryStatus;
 import com.flash3388.frc.ds.computer.CpuStatus;
-import com.flash3388.frc.ds.control.RobotControl;
-import com.flash3388.frc.ds.control.RobotControlMode;
-import com.flash3388.frc.ds.control.TeamStation;
+import com.flash3388.frc.ds.robot.RobotControl;
+import com.flash3388.frc.ds.robot.RobotControlMode;
+import com.flash3388.frc.ds.robot.TeamStation;
 import com.flash3388.frc.ds.ui.section.TabbedPane;
-import com.flash3388.frc.ds.ui.util.NodeHelper;
 import com.flash3388.frc.ds.util.ImageLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -38,6 +37,8 @@ public class MasterControlView extends TabbedPane.ViewController {
 
     private final Label mElapsedTimeLabel;
     private final ImageView mBatteryChargingIcon;
+    private final ProgressBar mBatteryLevel;
+    private final ProgressBar mCpuUsage;
     private final ComboBox<TeamStation> mTeamStationComboBox;
 
     private volatile Image mChargingImage;
@@ -50,7 +51,15 @@ public class MasterControlView extends TabbedPane.ViewController {
 
         mElapsedTimeLabel = new Label("0.0");
         mBatteryChargingIcon = new ImageView();
+        mBatteryLevel = new ProgressBar();
+        mCpuUsage = new ProgressBar();
         mTeamStationComboBox = new ComboBox<>();
+
+        mBatteryStatus.isChargingProperty().addListener((obs, o, n)-> {
+            setIsCharging(n);
+        });
+        mBatteryLevel.progressProperty().bind(mBatteryStatus.levelProperty());
+        mCpuUsage.progressProperty().bind(cpuStatus.usageProperty());
 
         HBox root = new HBox();
         root.setSpacing(10.0);
@@ -62,7 +71,7 @@ public class MasterControlView extends TabbedPane.ViewController {
         root.getChildren().addAll(
                 createLeftSide(robotControl, TOTAL_WIDTH),
                 separator,
-                createRightSize(batteryStatus, cpuStatus, TOTAL_WIDTH));
+                createRightSize(TOTAL_WIDTH));
 
         setPrefWidth(TOTAL_WIDTH);
         getChildren().add(root);
@@ -76,13 +85,13 @@ public class MasterControlView extends TabbedPane.ViewController {
     protected void startUsing() throws Exception {
         if (mChargingImage == null) {
             mChargingImage = mImageLoader.loadFromResource(CHARGING_IMAGE_RESOURCE);
-            setIsCharging(mBatteryStatus.isChargingValue().get());
         }
+
+        setIsCharging(mBatteryStatus.isChargingProperty().get());
     }
 
     @Override
     protected void stopUsing() {
-
     }
 
     private void setIsCharging(boolean isCharging) {
@@ -158,7 +167,7 @@ public class MasterControlView extends TabbedPane.ViewController {
         return left;
     }
 
-    private Node createRightSize(BatteryStatus batteryStatus, CpuStatus cpuStatus, double totalWidth) {
+    private Node createRightSize(double totalWidth) {
         final double RIGHT_WIDTH = totalWidth / 12 * 7;
         final int LABEL_COLUMN = 0;
         final int CONTENT_COLUMN = 1;
@@ -201,25 +210,17 @@ public class MasterControlView extends TabbedPane.ViewController {
 
         mBatteryChargingIcon.setFitWidth(15.0);
         mBatteryChargingIcon.setFitHeight(15.0);
-        batteryStatus.isChargingValue().addListener((obs, o, n)-> {
-            setIsCharging(n);
-        });
-        ProgressBar batteryLevel = new ProgressBar();
-        batteryLevel.progressProperty().bind(batteryStatus.levelValue());
 
         HBox batteryStatusPane = new HBox();
         batteryStatusPane.setSpacing(1.0);
         batteryStatusPane.setAlignment(Pos.CENTER_RIGHT);
-        batteryStatusPane.getChildren().addAll(mBatteryChargingIcon, batteryLevel);
-
-        ProgressBar cpuUsage = new ProgressBar();
-        cpuUsage.progressProperty().bind(cpuStatus.usageValue());
+        batteryStatusPane.getChildren().addAll(mBatteryChargingIcon, mBatteryLevel);
 
         computerStatusDataPane.add(batteryStatusPane, 0, 0);
-        computerStatusDataPane.add(cpuUsage, 0, 1);
+        computerStatusDataPane.add(mCpuUsage, 0, 1);
 
-        root.add(computerStatusLblPane, LABEL_COLUMN, 4);
-        root.add(computerStatusDataPane, CONTENT_COLUMN, 4);
+        root.add(computerStatusLblPane, LABEL_COLUMN, 3);
+        root.add(computerStatusDataPane, CONTENT_COLUMN, 3);
 
         Label teamStationLabel = new Label("Team Station");
 
