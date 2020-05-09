@@ -1,6 +1,8 @@
 package com.flash3388.frc.ds.ui.section;
 
+import com.castle.time.Time;
 import com.flash3388.frc.ds.DependencyHolder;
+import com.flash3388.frc.ds.util.Updatable;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
@@ -12,14 +14,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class TabbedPane extends TabPane {
+public class TabbedPane extends TabPane implements Updatable {
 
     interface ViewType {
         String displayName();
         ViewController createController(Stage owner, DependencyHolder dependencyHolder);
     }
 
-    public static abstract class ViewController extends AnchorPane {
+    public static abstract class ViewController extends AnchorPane implements Updatable {
 
 
         protected abstract void startUsing() throws Exception;
@@ -62,6 +64,14 @@ public class TabbedPane extends TabPane {
         getSelectionModel().select(pair.getKey());
 
         onControlChange(pair.getValue());
+    }
+
+    @Override
+    public void update(Time timePassed) {
+        ViewController selectedController = mSelectedController.get();
+        if (selectedController != null) {
+            selectedController.update(timePassed);
+        }
     }
 
     private void onControlChange(ViewController newViewController) {

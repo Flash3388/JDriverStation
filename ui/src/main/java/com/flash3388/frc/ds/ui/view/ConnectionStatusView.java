@@ -1,5 +1,6 @@
 package com.flash3388.frc.ds.ui.view;
 
+import com.castle.time.Time;
 import com.flash3388.frc.ds.robot.ConnectionStatus;
 import com.flash3388.frc.ds.robot.RobotControl;
 import com.flash3388.frc.ds.robot.RobotStatus;
@@ -88,6 +89,11 @@ public class ConnectionStatusView extends TabbedPane.ViewController {
 
     @Override
     protected void stopUsing() {
+
+    }
+
+    @Override
+    public void update(Time timePassed) {
 
     }
 

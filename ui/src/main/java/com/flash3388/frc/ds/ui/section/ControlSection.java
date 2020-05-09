@@ -20,7 +20,7 @@ public class ControlSection extends TabbedPane {
             public ViewController createController(Stage owner, DependencyHolder dependencyHolder) {
                 return new MasterControlView(dependencyHolder.getRobotControl(),
                         dependencyHolder.getBatteryStatus(), dependencyHolder.getCpuStatus(),
-                        dependencyHolder.getImageLoader());
+                        dependencyHolder.getImageLoader(), dependencyHolder.getClock());
             }
         },
         CONNECTION_STATUS {
@@ -34,7 +34,9 @@ public class ControlSection extends TabbedPane {
                 return new ConnectionStatusView(dependencyHolder.getRobotStatus(), dependencyHolder.getConnectionStatus(),
                         dependencyHolder.getRobotControl());
             }
-        }
+        },
+        // CONFIGURATION VIEW
+        // HID VIEW
         ;
     }
 

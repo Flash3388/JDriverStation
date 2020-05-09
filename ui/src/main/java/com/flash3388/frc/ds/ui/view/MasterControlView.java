@@ -1,5 +1,7 @@
 package com.flash3388.frc.ds.ui.view;
 
+import com.castle.time.Clock;
+import com.castle.time.Time;
 import com.flash3388.frc.ds.computer.BatteryStatus;
 import com.flash3388.frc.ds.computer.CpuStatus;
 import com.flash3388.frc.ds.robot.RobotControl;
@@ -28,28 +30,35 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
+import java.util.concurrent.TimeUnit;
+
 public class MasterControlView extends TabbedPane.ViewController {
 
     private static final String CHARGING_IMAGE_RESOURCE = "charging.png";
 
     private final BatteryStatus mBatteryStatus;
     private final ImageLoader mImageLoader;
+    private final Clock mClock;
 
+    private final ToggleButton mDisable;
     private final Label mElapsedTimeLabel;
     private final ImageView mBatteryChargingIcon;
     private final ProgressBar mBatteryLevel;
     private final ProgressBar mCpuUsage;
     private final ComboBox<TeamStation> mTeamStationComboBox;
 
+    private Time mStartEnabledTimestamp;
     private volatile Image mChargingImage;
 
-    public MasterControlView(RobotControl robotControl, BatteryStatus batteryStatus, CpuStatus cpuStatus, ImageLoader imageLoader) {
+    public MasterControlView(RobotControl robotControl, BatteryStatus batteryStatus, CpuStatus cpuStatus, ImageLoader imageLoader, Clock clock) {
         final double TOTAL_WIDTH = 350;
 
         mBatteryStatus = batteryStatus;
         mImageLoader = imageLoader;
+        mClock = clock;
 
-        mElapsedTimeLabel = new Label("0.0");
+        mDisable = new ToggleButton("Disable");
+        mElapsedTimeLabel = new Label("00:00.0");
         mBatteryChargingIcon = new ImageView();
         mBatteryLevel = new ProgressBar();
         mCpuUsage = new ProgressBar();
@@ -92,6 +101,26 @@ public class MasterControlView extends TabbedPane.ViewController {
 
     @Override
     protected void stopUsing() {
+        if (!mDisable.isSelected()) {
+            mDisable.setSelected(true);
+        }
+    }
+
+    @Override
+    public void update(Time timePassed) {
+        if (!mDisable.isSelected() && mStartEnabledTimestamp != null) {
+            Time delta = mClock.currentTime().sub(mStartEnabledTimestamp).toUnit(TimeUnit.MILLISECONDS);
+
+            Time deltaAsSeconds = delta.toUnit(TimeUnit.SECONDS);
+            Time deltaAsMinutes = delta.toUnit(TimeUnit.MINUTES);
+
+            long deltaAsMilliseconds = delta.value() - deltaAsSeconds.toUnit(TimeUnit.MILLISECONDS).value();
+
+            mElapsedTimeLabel.setText(String.format("%02d:%02d:%01d",
+                    deltaAsMinutes.value(),
+                    deltaAsSeconds.value() - deltaAsMinutes.toUnit(TimeUnit.SECONDS).value(),
+                    deltaAsMilliseconds / 100));
+        }
     }
 
     private void setIsCharging(boolean isCharging) {
@@ -114,21 +143,23 @@ public class MasterControlView extends TabbedPane.ViewController {
         enable.setPrefSize(LEFT_WIDTH / 2, 50);
         enable.setToggleGroup(masterControlToggleGroup);
         enable.setOnAction((e)-> {
+            mStartEnabledTimestamp = mClock.currentTime();
             robotControl.setEnabled(true);
         });
-        ToggleButton disable = new ToggleButton("Disable");
-        disable.setFont(CONTROL_BUTTON_FONT);
-        disable.setTextFill(Color.RED);
-        disable.setPrefSize(LEFT_WIDTH / 2, 50);
-        disable.setToggleGroup(masterControlToggleGroup);
-        disable.setSelected(true);
-        disable.setOnAction((e)-> {
+        mDisable.setFont(CONTROL_BUTTON_FONT);
+        mDisable.setTextFill(Color.RED);
+        mDisable.setPrefSize(LEFT_WIDTH / 2, 50);
+        mDisable.setToggleGroup(masterControlToggleGroup);
+        mDisable.setSelected(true);
+        mDisable.setOnAction((e)-> {
             robotControl.setEnabled(false);
+            mElapsedTimeLabel.setText("00:00.0");
+            mStartEnabledTimestamp = null;
         });
 
         HBox masterControlButtons = new HBox();
         masterControlButtons.setSpacing(1.0);
-        masterControlButtons.getChildren().addAll(enable, disable);
+        masterControlButtons.getChildren().addAll(enable, mDisable);
 
         VBox controlTypes = new VBox();
         controlTypes.setSpacing(1.0);
@@ -146,7 +177,7 @@ public class MasterControlView extends TabbedPane.ViewController {
         controlTypeToggleGroup.getToggles().get(0).setSelected(true);
         controlTypeToggleGroup.selectedToggleProperty().addListener((obs, o, n)-> {
             if (enable.isSelected()) {
-                disable.setSelected(true);
+                mDisable.setSelected(true);
             }
 
             RobotControlMode controlMode = (RobotControlMode) n.getUserData();

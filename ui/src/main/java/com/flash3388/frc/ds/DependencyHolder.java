@@ -1,5 +1,6 @@
 package com.flash3388.frc.ds;
 
+import com.castle.time.Clock;
 import com.flash3388.frc.ds.computer.BatteryStatus;
 import com.flash3388.frc.ds.computer.CpuStatus;
 import com.flash3388.frc.ds.robot.ConnectionStatus;
@@ -15,6 +16,7 @@ import java.util.concurrent.ExecutorService;
 
 public class DependencyHolder {
 
+    private final Clock mClock;
     private final RobotControl mRobotControl;
     private final RobotStatus mRobotStatus;
     private final ConnectionStatus mConnectionStatus;
@@ -22,15 +24,20 @@ public class DependencyHolder {
     private final CpuStatus mCpuStatus;
     private final ImageLoader mImageLoader;
 
-    public DependencyHolder(RobotControl robotControl, RobotStatus robotStatus, ConnectionStatus connectionStatus,
+    public DependencyHolder(Clock clock, RobotControl robotControl, RobotStatus robotStatus, ConnectionStatus connectionStatus,
                             BatteryStatus batteryStatus, CpuStatus cpuStatus,
                             ImageLoader imageLoader) {
+        mClock = clock;
         mRobotControl = robotControl;
         mRobotStatus = robotStatus;
         mConnectionStatus = connectionStatus;
         mBatteryStatus = batteryStatus;
         mCpuStatus = cpuStatus;
         mImageLoader = imageLoader;
+    }
+
+    public Clock getClock() {
+        return mClock;
     }
 
     public RobotControl getRobotControl() {
@@ -57,7 +64,7 @@ public class DependencyHolder {
         return mImageLoader;
     }
 
-    public static DependencyHolder create(ExecutorService executorService) {
+    public static DependencyHolder create(ExecutorService executorService, Clock clock) {
         BooleanProperty d = new SimpleBooleanProperty(false);
         executorService.execute(()-> {
             while (true) {
@@ -71,7 +78,7 @@ public class DependencyHolder {
         });
 
         return new DependencyHolder(
-                new RobotControl() {
+                clock, new RobotControl() {
                     @Override
                     public void setEnabled(boolean enabled) { }
                     @Override

@@ -1,9 +1,11 @@
 package com.flash3388.frc.ds.ui;
 
+import com.castle.time.Time;
 import com.flash3388.frc.ds.DependencyHolder;
 import com.flash3388.frc.ds.ui.section.BaseInfoSection;
 import com.flash3388.frc.ds.ui.section.ControlSection;
 import com.flash3388.frc.ds.ui.section.StatusSection;
+import com.flash3388.frc.ds.util.Updatable;
 import javafx.geometry.HPos;
 import javafx.geometry.Orientation;
 import javafx.geometry.VPos;
@@ -12,7 +14,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
-public class MainWindow extends AnchorPane {
+public class MainWindow extends AnchorPane implements Updatable {
 
     private final Stage mOwner;
 
@@ -46,5 +48,10 @@ public class MainWindow extends AnchorPane {
         AnchorPane.setRightAnchor(root, 0.0);
 
         getChildren().add(root);
+    }
+
+    @Override
+    public void update(Time timePassed) {
+        mControlSection.update(timePassed);
     }
 }
