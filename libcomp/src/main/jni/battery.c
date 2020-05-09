@@ -1,18 +1,9 @@
-///////////////////////////////////////////////////////////////////////
-// Christopher Mitchell
-// Linux Battery Level Checker
-// May 13th, 2009
-// http://www.cemetech.net
-//
-// This code isn't terribly groundbreaking, but please be respectful as
-// far as reuse and modifications; credit me, or at least drop me an
-// email to let me know you found my code helpful
 
-
-// MODIFIED FROM https://www.cemetech.net/forum/viewtopic.php?t=3638&start=0
-///////////////////////////////////////////////////////////////////////
 
 #include "battery.h"
+#include "errors.h"
+
+#ifdef __linux__
 
 #include <stdio.h>
 #include <string.h>
@@ -21,8 +12,6 @@
 #include <linux/limits.h>
 #include <regex.h>
 #include <stdbool.h>
-
-#include "errors.h"
 
 #define DATADIR "/sys/class/power_supply"
 #define CHARGE_NOW "energy_now"
@@ -163,112 +152,4 @@ clean:
     return result;
 }
 
-/*#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <math.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-
-#define PATH_BATT_STATE "/proc/acpi/battery/BAT0/state"
-#define PATH_BATT_INFO "/proc/acpi/battery/BAT0/info"
-#define BATT_READ_BUFLEN 256
-
-int battery_get_state(struct battery_state* mybattstate) {
-    printf("battery_get_state \n");
-    int battStateHandle;
-    long int battRate_mA=0;
-    long int battMax_mAh=0;
-    long int battRemain_mAh=0;
-    char buffer[BATT_READ_BUFLEN];
-    char tok_unit[8];
-    int readoffset;
-    short int readstate=0,readlen=0;      //0=reading,1=eol,2=eof
-
-    if (-1 == (battStateHandle = open(PATH_BATT_INFO,O_RDONLY))) {
-        return -1;
-    }
-
-    while (readstate < 2) {
-        readoffset = 0;
-        readstate = 0;
-        while (!readstate) {
-            if (0 > (readlen = read(battStateHandle,buffer+readoffset,1))) {
-                //perror("Failed to read battery state");
-                return -2;
-            }
-            if (!readlen) {
-                readstate=2;
-                break;
-            }
-            if ('\n' == *(buffer+readoffset)) {
-                readstate++;
-                *(buffer+readoffset+1) = '\0';
-            }
-            readoffset++;
-        }
-        if (readstate == 2) break;
-        if (NULL != strstr(buffer,"last full capacity")) {
-            if (0 >= sscanf(buffer+25,"%ld %s",&battMax_mAh,tok_unit)) {
-                return -3;
-            }
-            break;
-        }
-    }
-    close(battStateHandle);
-
-    if (-1 == (battStateHandle = open(PATH_BATT_STATE,O_RDONLY))) {
-        return -4;
-    }
-
-    readstate = 0;
-    while (readstate < 2) {
-        readoffset = 0;
-        readstate = 0;
-        while (!readstate) {
-            if (0 > (readlen = read(battStateHandle,buffer+readoffset,1))) {
-                //perror("Failed to read battery state");
-                return -5;
-            }
-            if (0 == readlen) {
-                readstate=2;
-                break;
-            }
-            if ('\n' == *(buffer+readoffset)) {
-                readstate++;
-                *(buffer+readoffset+1) = '\0';
-            }
-            readoffset++;
-        }
-        if (readstate == 2) break;
-        if (NULL != strstr(buffer,"charging state")) {
-            if (NULL != strstr(buffer,"discharging")) mybattstate->powerstate = POWER_DISCHARGING;
-            else if (NULL != strstr(buffer,"charged")) mybattstate->powerstate = POWER_CHARGED;
-            else mybattstate->powerstate = POWER_CHARGING;
-        } else if (NULL != strstr(buffer,"present rate")) {
-            if (0 >= sscanf(buffer+25,"%ld %s",&battRate_mA,tok_unit)) {
-                //perror("sscanf for battery rate failed");
-                return -6;
-            }
-        } else if (NULL != strstr(buffer,"remaining capacity")) {
-            if (0 >= sscanf(buffer+25,"%ld %s",&battRemain_mAh,tok_unit)) {
-                //perror("sscanf for battery capacity");
-                return -7;
-            }
-        }
-    }
-    close(battStateHandle);
-
-    mybattstate->chargelevel = 100.00*((float)battRemain_mAh/(float)battMax_mAh);
-    if (battRate_mA) {
-        mybattstate->time_hour = floor(battRemain_mAh/battRate_mA);
-        mybattstate->time_min = floor(60*(((float)battRemain_mAh/(float)battRate_mA)-mybattstate->time_hour));
-    }
-
-    printf("battery_get_state return\n");
-    return 0;
-}*/
+#endif

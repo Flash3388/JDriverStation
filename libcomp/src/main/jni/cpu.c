@@ -1,12 +1,12 @@
+#include "cpu.h"
+#include "errors.h"
+
+#ifdef __linux__
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <zconf.h>
-
-#include "cpu.h"
-
-#include "errors.h"
-
 
 static int read_cpu_usage(char* buffer, const int buffer_size, float* usage) {
     const char* delim = " ";
@@ -47,6 +47,8 @@ static int read_cpu_usage(char* buffer, const int buffer_size, float* usage) {
 
     return 0;
 }
+
+#endif
 
 int cpu_get_usage(float* usage) {
     char buffer[100];
