@@ -20,7 +20,9 @@ public class Main {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         closer.add(executorService::shutdownNow);
 
-        UserInterface userInterface = new UserInterface(executorService, windowConfig, runLatch::countDown);
+        DependencyHolder dependencyHolder = DependencyHolder.create();
+
+        UserInterface userInterface = new UserInterface(executorService, windowConfig, dependencyHolder, runLatch::countDown);
         DriverStation driverStation = new DriverStation(userInterface);
         try {
             driverStation.start();

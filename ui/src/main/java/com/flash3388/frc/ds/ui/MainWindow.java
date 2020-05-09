@@ -1,5 +1,6 @@
 package com.flash3388.frc.ds.ui;
 
+import com.flash3388.frc.ds.DependencyHolder;
 import com.flash3388.frc.ds.ui.section.BaseInfoSection;
 import com.flash3388.frc.ds.ui.section.ControlSection;
 import com.flash3388.frc.ds.ui.section.StatusSection;
@@ -9,7 +10,6 @@ import javafx.geometry.VPos;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 public class MainWindow extends AnchorPane {
@@ -20,10 +20,10 @@ public class MainWindow extends AnchorPane {
     private final BaseInfoSection mBaseInfoSection;
     private final StatusSection mStatusSection;
 
-    public MainWindow(Stage owner) {
+    public MainWindow(Stage owner, DependencyHolder dependencyHolder) {
         mOwner = owner;
 
-        mControlSection = new ControlSection();
+        mControlSection = new ControlSection(owner, dependencyHolder);
         Separator separator1 = new Separator();
         separator1.setOrientation(Orientation.VERTICAL);
         separator1.setValignment(VPos.CENTER);

@@ -1,5 +1,6 @@
 package com.flash3388.frc.ds.ui;
 
+import com.flash3388.frc.ds.DependencyHolder;
 import com.flash3388.frc.ds.ui.exceptions.LaunchException;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -16,6 +17,7 @@ public class DriverStationApplication extends Application {
     private static final CyclicBarrier sBarrier = new CyclicBarrier(2);
 
     private static volatile WindowConfig sWindowConfig;
+    private static volatile DependencyHolder sDependencyHolder;
 
     private static volatile DriverStationApplication sInstance;
 
@@ -28,7 +30,7 @@ public class DriverStationApplication extends Application {
             sInstance = this;
             mPrimaryStage.set(primaryStage);
 
-            MainWindow mainWindow = new MainWindow(primaryStage);
+            MainWindow mainWindow = new MainWindow(primaryStage, sDependencyHolder);
             mMainWindow.set(mainWindow);
 
             sBarrier.await();
@@ -44,8 +46,9 @@ public class DriverStationApplication extends Application {
         }
     }
 
-    public static Pair<Stage, MainWindow> launch(ExecutorService executorService, WindowConfig windowConfig) throws LaunchException {
+    public static Pair<Stage, MainWindow> launch(ExecutorService executorService, WindowConfig windowConfig, DependencyHolder dependencyHolder) throws LaunchException {
         sWindowConfig = windowConfig;
+        sDependencyHolder = dependencyHolder;
         executorService.submit(()->Application.launch(DriverStationApplication.class));
 
         try {
