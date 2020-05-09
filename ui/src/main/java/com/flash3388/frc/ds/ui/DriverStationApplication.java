@@ -35,7 +35,7 @@ public class DriverStationApplication extends Application {
 
             sBarrier.await();
 
-            primaryStage.setResizable(true);
+            primaryStage.setResizable(false);
             primaryStage.setTitle("JDriverStation");
             primaryStage.setFullScreen(sWindowConfig.isFullScreen());
             primaryStage.setScene(new Scene(mainWindow,

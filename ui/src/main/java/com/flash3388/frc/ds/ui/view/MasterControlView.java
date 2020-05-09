@@ -26,6 +26,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 public class MasterControlView extends TabbedPane.ViewController {
 
@@ -41,7 +43,7 @@ public class MasterControlView extends TabbedPane.ViewController {
     private volatile Image mChargingImage;
 
     public MasterControlView(RobotControl robotControl, BatteryStatus batteryStatus, CpuStatus cpuStatus, ImageLoader imageLoader) {
-        final double TOTAL_WIDTH = 400;
+        final double TOTAL_WIDTH = 350;
 
         mBatteryStatus = batteryStatus;
         mImageLoader = imageLoader;
@@ -74,7 +76,7 @@ public class MasterControlView extends TabbedPane.ViewController {
     protected void startUsing() throws Exception {
         if (mChargingImage == null) {
             mChargingImage = mImageLoader.loadFromResource(CHARGING_IMAGE_RESOURCE);
-            mBatteryChargingIcon.setImage(mBatteryStatus.isChargingValue().get() ? mChargingImage : null);
+            setIsCharging(false);//mBatteryStatus.isChargingValue().get());
         }
     }
 
@@ -83,17 +85,31 @@ public class MasterControlView extends TabbedPane.ViewController {
 
     }
 
+    private void setIsCharging(boolean isCharging) {
+        if (isCharging) {
+            mBatteryChargingIcon.setImage(mChargingImage);
+        } else {
+            mBatteryChargingIcon.setImage(null);
+        }
+    }
+
     private Node createLeftSide(RobotControl robotControl, double totalWidth) {
-        final double LEFT_WIDTH = totalWidth / 10 * 4;
+        final double LEFT_WIDTH = totalWidth / 12 * 5;
+        final Font CONTROL_BUTTON_FONT = Font.font(13);
+        final Font CONTROL_MODE_FONT = Font.font(11);
 
         ToggleGroup masterControlToggleGroup = new ToggleGroup();
         ToggleButton enable = new ToggleButton("Enable");
+        enable.setFont(CONTROL_BUTTON_FONT);
+        enable.setTextFill(Color.GREEN);
         enable.setPrefSize(LEFT_WIDTH / 2, 50);
         enable.setToggleGroup(masterControlToggleGroup);
         enable.setOnAction((e)-> {
             robotControl.setEnabled(true);
         });
         ToggleButton disable = new ToggleButton("Disable");
+        disable.setFont(CONTROL_BUTTON_FONT);
+        disable.setTextFill(Color.RED);
         disable.setPrefSize(LEFT_WIDTH / 2, 50);
         disable.setToggleGroup(masterControlToggleGroup);
         disable.setSelected(true);
@@ -111,6 +127,7 @@ public class MasterControlView extends TabbedPane.ViewController {
         ToggleGroup controlTypeToggleGroup = new ToggleGroup();
         for (RobotControlMode controlMode : RobotControlMode.values()) {
             ToggleButton button = new ToggleButton(controlMode.displayName());
+            button.setFont(CONTROL_MODE_FONT);
             button.setPrefSize(LEFT_WIDTH, 10);
             button.setToggleGroup(controlTypeToggleGroup);
             button.setUserData(controlMode);
@@ -128,12 +145,12 @@ public class MasterControlView extends TabbedPane.ViewController {
         });
 
         AnchorPane left = new AnchorPane();
-        left.setPadding(new Insets(5.0));
+        left.setPadding(new Insets(4.0));
         left.setPrefWidth(LEFT_WIDTH);
         left.getChildren().addAll(controlTypes, masterControlButtons);
         AnchorPane.setBottomAnchor(masterControlButtons, 0.0);
-        AnchorPane.setLeftAnchor(masterControlButtons, 5.0);
-        AnchorPane.setRightAnchor(masterControlButtons, 5.0);
+        AnchorPane.setLeftAnchor(masterControlButtons, 1.0);
+        AnchorPane.setRightAnchor(masterControlButtons, 1.0);
         AnchorPane.setTopAnchor(controlTypes, 0.0);
         AnchorPane.setLeftAnchor(controlTypes, 5.0);
         AnchorPane.setRightAnchor(controlTypes, 5.0);
@@ -142,56 +159,76 @@ public class MasterControlView extends TabbedPane.ViewController {
     }
 
     private Node createRightSize(BatteryStatus batteryStatus, CpuStatus cpuStatus, double totalWidth) {
-        final double RIGHT_WIDTH = totalWidth / 10 * 6;
+        final double RIGHT_WIDTH = totalWidth / 12 * 7;
         final int LABEL_COLUMN = 0;
         final int CONTENT_COLUMN = 1;
 
         GridPane root = new GridPane();
-        root.setHgap(3.0);
+        root.setHgap(1.0);
         root.setVgap(20.0);
         root.setAlignment(Pos.CENTER);
         root.setGridLinesVisible(false);
         root.setPrefWidth(RIGHT_WIDTH);
 
-        Label elapsedTimeTextLabel = new Label("Elapsed Time:");
-        root.add(elapsedTimeTextLabel, LABEL_COLUMN, 0);
-        root.add(mElapsedTimeLabel, CONTENT_COLUMN, 0);
+        HBox elapsedTimePane = new HBox();
+        elapsedTimePane.setSpacing(1.0);
+        elapsedTimePane.setAlignment(Pos.CENTER);
+        elapsedTimePane.getChildren().addAll(mElapsedTimeLabel);
 
-        mBatteryChargingIcon.setFitWidth(30.0);
-        mBatteryChargingIcon.setFitHeight(30.0);
+        Label elapsedTimeTextLabel = new Label("Elapsed Time");
+        elapsedTimeTextLabel.setPrefWidth(RIGHT_WIDTH / 10 * 6);
+        root.add(elapsedTimeTextLabel, LABEL_COLUMN, 0);
+        root.add(elapsedTimePane, CONTENT_COLUMN, 0);
+
+        GridPane computerStatusLblPane = new GridPane();
+        computerStatusLblPane.setHgap(1.0);
+        computerStatusLblPane.setVgap(1.0);
+        computerStatusLblPane.setAlignment(Pos.CENTER_LEFT);
+        computerStatusLblPane.setGridLinesVisible(false);
+        computerStatusLblPane.setPrefWidth(RIGHT_WIDTH / 2);
+
+        Label batteryLevelLbl = new Label("PC Battery");
+        Label cpuUsageLbl = new Label("CPU Usage");
+        computerStatusLblPane.add(batteryLevelLbl, 0, 0);
+        computerStatusLblPane.add(cpuUsageLbl, 0, 1);
+
+        GridPane computerStatusDataPane = new GridPane();
+        computerStatusDataPane.setHgap(1.0);
+        computerStatusDataPane.setVgap(1.0);
+        computerStatusDataPane.setAlignment(Pos.CENTER_RIGHT);
+        computerStatusDataPane.setGridLinesVisible(false);
+        computerStatusDataPane.setPrefWidth(RIGHT_WIDTH / 2);
+
+        mBatteryChargingIcon.setFitWidth(15.0);
+        mBatteryChargingIcon.setFitHeight(15.0);
         batteryStatus.isChargingValue().addListener((obs, o, n)-> {
-            mBatteryChargingIcon.setImage(n ? mChargingImage : null);
+            setIsCharging(n);
         });
         ProgressBar batteryLevel = new ProgressBar();
         batteryLevel.progressProperty().bind(batteryStatus.levelValue());
 
         HBox batteryStatusPane = new HBox();
         batteryStatusPane.setSpacing(1.0);
-        batteryStatusPane.setAlignment(Pos.CENTER);
+        batteryStatusPane.setAlignment(Pos.CENTER_RIGHT);
         batteryStatusPane.getChildren().addAll(mBatteryChargingIcon, batteryLevel);
-
-        Label batteryLevelLbl = new Label("PC Battery");
-
-        root.add(batteryLevelLbl, LABEL_COLUMN, 3);
-        root.add(batteryStatusPane, CONTENT_COLUMN, 3);
 
         ProgressBar cpuUsage = new ProgressBar();
         cpuUsage.progressProperty().bind(cpuStatus.usageValue());
-        Label cpuUsageLbl = new Label("CPU Usage");
 
-        root.add(cpuUsageLbl, LABEL_COLUMN, 4);
-        root.add(cpuUsage, CONTENT_COLUMN, 4);
+        computerStatusDataPane.add(batteryStatusPane, 0, 0);
+        computerStatusDataPane.add(cpuUsage, 0, 1);
 
+        root.add(computerStatusLblPane, LABEL_COLUMN, 4);
+        root.add(computerStatusDataPane, CONTENT_COLUMN, 4);
 
         Label teamStationLabel = new Label("Team Station");
-        teamStationLabel.setPadding(new Insets(2.5, 0.0, 0.0, 0.0));
 
         mTeamStationComboBox.getItems().addAll(TeamStation.getAll());
         mTeamStationComboBox.getSelectionModel().select(0);
         mTeamStationComboBox.setPrefWidth(RIGHT_WIDTH / 2);
 
-        root.add(teamStationLabel, LABEL_COLUMN, 6);
-        root.add(mTeamStationComboBox, CONTENT_COLUMN, 6);
+        root.add(teamStationLabel, LABEL_COLUMN, 8);
+        root.add(mTeamStationComboBox, CONTENT_COLUMN, 8);
 
         AnchorPane anchorPane = new AnchorPane();
         anchorPane.getChildren().add(root);

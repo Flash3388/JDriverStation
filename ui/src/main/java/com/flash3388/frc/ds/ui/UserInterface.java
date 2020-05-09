@@ -22,7 +22,7 @@ public class UserInterface {
         mShutdownTask = shutdownTask;
     }
 
-    public synchronized void launch() throws LaunchException {
+    public void launch() throws LaunchException {
         Pair<Stage, MainWindow> windowPair = DriverStationApplication.launch(mExecutorService, mWindowConfig, mDependencyHolder);
         Stage stage = windowPair.getKey();
         stage.setOnCloseRequest((e) -> mShutdownTask.run());
@@ -30,7 +30,7 @@ public class UserInterface {
         MainWindow mainWindow = windowPair.getValue();
     }
 
-    public synchronized void shutdown() {
+    public void shutdown() {
         Platform.exit();
     }
 }

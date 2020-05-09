@@ -10,17 +10,17 @@ import java.util.concurrent.Executors;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         WindowConfig windowConfig = new WindowConfig(500, 300, false);
 
         Closer closer = Closer.empty();
         CountDownLatch runLatch = new CountDownLatch(1);
 
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
         closer.add(executorService::shutdownNow);
 
-        DependencyHolder dependencyHolder = DependencyHolder.create();
+        DependencyHolder dependencyHolder = DependencyHolder.create(executorService);
 
         UserInterface userInterface = new UserInterface(executorService, windowConfig, dependencyHolder, runLatch::countDown);
         DriverStation driverStation = new DriverStation(userInterface);
@@ -28,9 +28,15 @@ public class Main {
             driverStation.start();
             runLatch.await();
         } catch (Throwable t) {
-
+            t.printStackTrace();
         } finally {
             driverStation.stop();
+
+            try {
+                closer.close();
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
         }
     }
 }
