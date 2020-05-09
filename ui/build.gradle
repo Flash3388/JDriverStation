@@ -1,0 +1,49 @@
+plugins {
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
+}
+
+apply from: rootProject.file('dependencies.gradle')
+
+sourceCompatibility = JavaVersion.VERSION_11
+
+
+dependencies {
+    implementation castle()
+    implementation javabeans()
+    implementation slf4jApi()
+    implementation ntcore()
+    implementation controlfx()
+
+    testImplementation junit()
+    testImplementation mockito()
+    testImplementation hamcrest()
+}
+
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        events "failed"
+        exceptionFormat "full"
+        showStackTraces true
+    }
+}
+
+javafx {
+    version = '11'
+    modules = ['javafx.controls', 'javafx.graphics', 'javafx.base']
+}
+
+application {
+    mainClassName = 'flashboard.main/com.flash3388.flashboard.Main'
+    applicationName = 'Flashboard'
+}
+
+startScripts {
+    defaultJvmOpts = ['-Djdk.gtk.version=2']
+}
+
+run {
+    jvmArgs '-Djdk.gtk.version=2'
+}
