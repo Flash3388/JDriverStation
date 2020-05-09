@@ -1,1 +1,1 @@
-include 'ui', 'api'
+include 'ui', 'libds', 'libcomp'

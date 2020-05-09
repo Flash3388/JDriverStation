@@ -3,21 +3,8 @@ package com.flash3388.frc.ds.computer;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableDoubleValue;
 
-public class BatteryStatus {
+public interface BatteryStatus {
 
-    private final ObservableDoubleValue mLevel;
-    private final ObservableBooleanValue mIsCharging;
-
-    public BatteryStatus(ObservableDoubleValue level, ObservableBooleanValue isCharging) {
-        mLevel = level;
-        mIsCharging = isCharging;
-    }
-
-    public ObservableDoubleValue levelProperty() {
-        return mLevel;
-    }
-
-    public ObservableBooleanValue isChargingProperty() {
-        return mIsCharging;
-    }
+    ObservableDoubleValue levelProperty();
+    ObservableBooleanValue isChargingProperty();
 }

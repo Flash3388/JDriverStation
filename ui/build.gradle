@@ -9,6 +9,8 @@ sourceCompatibility = JavaVersion.VERSION_11
 
 
 dependencies {
+    implementation project(':libcomp')
+
     implementation castle()
     implementation slf4jApi()
     implementation controlfx()

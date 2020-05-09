@@ -1,0 +1,28 @@
+plugins {
+    id 'java-library'
+}
+
+sourceCompatibility = JavaVersion.VERSION_11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+}
+
+jar {
+    from (file("${project.buildDir.absolutePath}/cmake/libcomp.so")) {
+        into 'linux64'
+    }
+    archiveBaseName.set('comp')
+
+    archiveFileName.set("${archiveBaseName.get()}.${archiveExtension.get()}")
+    destinationDirectory.set(project.buildDir)
+}
+
+apply from: rootProject.file('cmake.gradle')
+
+tasks.clean.dependsOn tasks.deleteBuildDirectory
+tasks.jar.dependsOn tasks.buildNatives

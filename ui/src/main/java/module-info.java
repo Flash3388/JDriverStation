@@ -6,6 +6,8 @@ module driverstation.main {
     requires castle;
     requires org.controlsfx.controls;
 
+    requires driverstation.libcomp;
+
     exports com.flash3388.frc.ds;
     exports com.flash3388.frc.ds.ui;
 }

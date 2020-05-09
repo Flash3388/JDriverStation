@@ -64,19 +64,7 @@ public class DependencyHolder {
         return mImageLoader;
     }
 
-    public static DependencyHolder create(ExecutorService executorService, Clock clock) {
-        BooleanProperty d = new SimpleBooleanProperty(false);
-        executorService.execute(()-> {
-            while (true) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    break;
-                }
-                d.set(!d.get());
-            }
-        });
-
+    public static DependencyHolder create(ExecutorService executorService, Clock clock, BatteryStatus batteryStatus, CpuStatus cpuStatus) {
         return new DependencyHolder(
                 clock, new RobotControl() {
                     @Override
@@ -90,8 +78,7 @@ public class DependencyHolder {
                 },
                 new RobotStatus(new SimpleDoubleProperty(), new SimpleDoubleProperty(), new SimpleDoubleProperty(), new SimpleDoubleProperty()),
                 new ConnectionStatus(new SimpleBooleanProperty(), new SimpleBooleanProperty(), new SimpleBooleanProperty()),
-                new BatteryStatus(new SimpleDoubleProperty(0.5), d),
-                new CpuStatus(new SimpleDoubleProperty(0.5)),
+                batteryStatus, cpuStatus,
                 new ImageLoader(DependencyHolder.class.getClassLoader())
         );
     }

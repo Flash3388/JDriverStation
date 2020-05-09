@@ -21,7 +21,7 @@ task deleteBuildDirectory(type: Delete) {
 }
 
 task createBuildDirectory(type: Exec, dependsOn: deleteBuildDirectory) {
-    commandLine 'mkdir', BUILD_DIR.absolutePath
+    commandLine 'mkdir', '-p', BUILD_DIR.absolutePath
 }
 
 task runCmake(type: Exec, dependsOn: createBuildDirectory) {

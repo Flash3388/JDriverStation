@@ -1,0 +1,8 @@
+#pragma once
+
+#define ERROR_FOLDER_NOT_FOUND (-1)
+#define ERROR_FILE_NOT_FOUND (-2)
+#define ERROR_REGEX_COMPILE (-3)
+#define ERROR_REGEX_FIND (-4)
+#define ERROR_FILE_READING (-5)
+#define ERROR_CHARGE_STATUS_UNKNOWN (-6)
