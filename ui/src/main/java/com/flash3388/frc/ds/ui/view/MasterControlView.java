@@ -76,7 +76,7 @@ public class MasterControlView extends TabbedPane.ViewController {
     protected void startUsing() throws Exception {
         if (mChargingImage == null) {
             mChargingImage = mImageLoader.loadFromResource(CHARGING_IMAGE_RESOURCE);
-            setIsCharging(false);//mBatteryStatus.isChargingValue().get());
+            setIsCharging(mBatteryStatus.isChargingValue().get());
         }
     }
 
