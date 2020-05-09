@@ -32,7 +32,7 @@ public class ControlSection extends TabbedPane {
 
             @Override
             public ViewController createController(Stage owner, DependencyHolder dependencyHolder) {
-                return new ConnectionStatusView(dependencyHolder.getRobotStatus(), dependencyHolder.getConnectionStatus(),
+                return new ConnectionStatusView(dependencyHolder.getRobotUsageStatus(), dependencyHolder.getConnectionStatus(),
                         dependencyHolder.getRobotControl());
             }
         },

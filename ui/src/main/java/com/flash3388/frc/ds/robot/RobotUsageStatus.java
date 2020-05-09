@@ -2,14 +2,14 @@ package com.flash3388.frc.ds.robot;
 
 import javafx.beans.property.ReadOnlyDoubleProperty;
 
-public class RobotStatus {
+public class RobotUsageStatus {
 
     private final ReadOnlyDoubleProperty mCpuUsage;
     private final ReadOnlyDoubleProperty mRamUsage;
     private final ReadOnlyDoubleProperty mDiskUsage;
     private final ReadOnlyDoubleProperty mCanUtilization;
 
-    public RobotStatus(ReadOnlyDoubleProperty cpuUsage, ReadOnlyDoubleProperty ramUsage, ReadOnlyDoubleProperty diskUsage, ReadOnlyDoubleProperty canUtilization) {
+    public RobotUsageStatus(ReadOnlyDoubleProperty cpuUsage, ReadOnlyDoubleProperty ramUsage, ReadOnlyDoubleProperty diskUsage, ReadOnlyDoubleProperty canUtilization) {
         mCpuUsage = cpuUsage;
         mRamUsage = ramUsage;
         mDiskUsage = diskUsage;

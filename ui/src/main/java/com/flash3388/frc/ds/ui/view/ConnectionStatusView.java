@@ -3,7 +3,7 @@ package com.flash3388.frc.ds.ui.view;
 import com.castle.time.Time;
 import com.flash3388.frc.ds.robot.ConnectionStatus;
 import com.flash3388.frc.ds.robot.RobotControl;
-import com.flash3388.frc.ds.robot.RobotStatus;
+import com.flash3388.frc.ds.robot.RobotUsageStatus;
 import com.flash3388.frc.ds.ui.section.TabbedPane;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -16,7 +16,7 @@ import javafx.scene.layout.VBox;
 
 public class ConnectionStatusView extends TabbedPane.ViewController {
 
-    private final RobotStatus mRobotStatus;
+    private final RobotUsageStatus mRobotUsageStatus;
     private final ConnectionStatus mConnectionStatus;
 
     private final CheckBox mFmsConnected;
@@ -28,10 +28,10 @@ public class ConnectionStatusView extends TabbedPane.ViewController {
     private final Label mDiskUsage;
     private final Label mCanUtilization;
 
-    public ConnectionStatusView(RobotStatus robotStatus, ConnectionStatus connectionStatus, RobotControl robotControl) {
+    public ConnectionStatusView(RobotUsageStatus robotUsageStatus, ConnectionStatus connectionStatus, RobotControl robotControl) {
         final double TOTAL_WIDTH = 350;
 
-        mRobotStatus = robotStatus;
+        mRobotUsageStatus = robotUsageStatus;
         mConnectionStatus = connectionStatus;
 
         mFmsConnected = new CheckBox();
@@ -50,10 +50,10 @@ public class ConnectionStatusView extends TabbedPane.ViewController {
         mDiskUsage = new Label("0.0");
         mCanUtilization = new Label("0.0");
 
-        mCpuUsage.textProperty().bind(mRobotStatus.cpuUsageProperty().asString());
-        mRamUsage.textProperty().bind(mRobotStatus.ramUsageProperty().asString());
-        mDiskUsage.textProperty().bind(mRobotStatus.diskUsageProperty().asString());
-        mCanUtilization.textProperty().bind(mRobotStatus.canUtilizationProperty().asString());
+        mCpuUsage.textProperty().bind(mRobotUsageStatus.cpuUsageProperty().asString());
+        mRamUsage.textProperty().bind(mRobotUsageStatus.ramUsageProperty().asString());
+        mDiskUsage.textProperty().bind(mRobotUsageStatus.diskUsageProperty().asString());
+        mCanUtilization.textProperty().bind(mRobotUsageStatus.canUtilizationProperty().asString());
 
         Button rebootRoborio = new Button("Reboot RoboRIO");
         rebootRoborio.setPrefSize(TOTAL_WIDTH / 2, 20);

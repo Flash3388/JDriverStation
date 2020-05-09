@@ -30,7 +30,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         loadNatives();
 
-        WindowConfig windowConfig = new WindowConfig(500, 300, false);
+        WindowConfig windowConfig = new WindowConfig(800, 300, false);
 
         Clock clock = new SystemMillisClock();
 

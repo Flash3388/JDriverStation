@@ -7,11 +7,13 @@ import com.flash3388.frc.ds.ui.section.ControlSection;
 import com.flash3388.frc.ds.ui.section.StatusSection;
 import com.flash3388.frc.ds.util.Updatable;
 import javafx.geometry.HPos;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.VPos;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 public class MainWindow extends AnchorPane implements Updatable {
@@ -30,16 +32,20 @@ public class MainWindow extends AnchorPane implements Updatable {
         separator1.setOrientation(Orientation.VERTICAL);
         separator1.setValignment(VPos.CENTER);
         separator1.setHalignment(HPos.CENTER);
-        mBaseInfoSection = new BaseInfoSection();
+        mBaseInfoSection = new BaseInfoSection(owner, dependencyHolder);
         Separator separator2 = new Separator();
         separator2.setOrientation(Orientation.VERTICAL);
         separator2.setValignment(VPos.CENTER);
         separator2.setHalignment(HPos.CENTER);
         mStatusSection = new StatusSection();
 
+        HBox center = new HBox();
+        center.setPadding(new Insets(0.0, 10.0, 0.0, 10.0));
+        center.getChildren().add(mBaseInfoSection);
+
         BorderPane root = new BorderPane();
         root.setLeft(mControlSection);
-        root.setCenter(mBaseInfoSection);
+        root.setCenter(center);
         root.setRight(mStatusSection);
 
         AnchorPane.setTopAnchor(root, 0.0);

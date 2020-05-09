@@ -6,11 +6,13 @@ import com.flash3388.frc.ds.computer.CpuStatus;
 import com.flash3388.frc.ds.robot.ConnectionStatus;
 import com.flash3388.frc.ds.robot.RobotControl;
 import com.flash3388.frc.ds.robot.RobotControlMode;
-import com.flash3388.frc.ds.robot.RobotStatus;
+import com.flash3388.frc.ds.robot.RobotPowerStatus;
+import com.flash3388.frc.ds.robot.RobotUsageStatus;
 import com.flash3388.frc.ds.util.ImageLoader;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ObservableBooleanValue;
+import javafx.beans.value.ObservableValue;
 
 import java.util.concurrent.ExecutorService;
 
@@ -18,18 +20,21 @@ public class DependencyHolder {
 
     private final Clock mClock;
     private final RobotControl mRobotControl;
-    private final RobotStatus mRobotStatus;
+    private final RobotPowerStatus mRobotPowerStatus;
+    private final RobotUsageStatus mRobotUsageStatus;
     private final ConnectionStatus mConnectionStatus;
     private final BatteryStatus mBatteryStatus;
     private final CpuStatus mCpuStatus;
     private final ImageLoader mImageLoader;
 
-    public DependencyHolder(Clock clock, RobotControl robotControl, RobotStatus robotStatus, ConnectionStatus connectionStatus,
+    public DependencyHolder(Clock clock,
+                            RobotControl robotControl, RobotPowerStatus robotPowerStatus, RobotUsageStatus robotUsageStatus, ConnectionStatus connectionStatus,
                             BatteryStatus batteryStatus, CpuStatus cpuStatus,
                             ImageLoader imageLoader) {
         mClock = clock;
         mRobotControl = robotControl;
-        mRobotStatus = robotStatus;
+        mRobotPowerStatus = robotPowerStatus;
+        mRobotUsageStatus = robotUsageStatus;
         mConnectionStatus = connectionStatus;
         mBatteryStatus = batteryStatus;
         mCpuStatus = cpuStatus;
@@ -44,8 +49,12 @@ public class DependencyHolder {
         return mRobotControl;
     }
 
-    public RobotStatus getRobotStatus() {
-        return mRobotStatus;
+    public RobotPowerStatus getRobotPowerStatus() {
+        return mRobotPowerStatus;
+    }
+
+    public RobotUsageStatus getRobotUsageStatus() {
+        return mRobotUsageStatus;
     }
 
     public ConnectionStatus getConnectionStatus() {
@@ -71,12 +80,24 @@ public class DependencyHolder {
                     public void setEnabled(boolean enabled) { }
                     @Override
                     public void setControlMode(RobotControlMode controlMode) { }
+
+                    @Override
+                    public ObservableBooleanValue enabledProperty() {
+                        return null;
+                    }
+
+                    @Override
+                    public ObservableValue<RobotControlMode> controlModeProperty() {
+                        return null;
+                    }
+
                     @Override
                     public void rebootRoboRio() { }
                     @Override
                     public void restartCode() { }
                 },
-                new RobotStatus(new SimpleDoubleProperty(), new SimpleDoubleProperty(), new SimpleDoubleProperty(), new SimpleDoubleProperty()),
+                new RobotPowerStatus(new SimpleDoubleProperty(), new SimpleDoubleProperty()),
+                new RobotUsageStatus(new SimpleDoubleProperty(), new SimpleDoubleProperty(), new SimpleDoubleProperty(), new SimpleDoubleProperty()),
                 new ConnectionStatus(new SimpleBooleanProperty(), new SimpleBooleanProperty(), new SimpleBooleanProperty()),
                 batteryStatus, cpuStatus,
                 new ImageLoader(DependencyHolder.class.getClassLoader())
