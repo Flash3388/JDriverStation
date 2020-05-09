@@ -2,6 +2,7 @@ package com.flash3388.frc.ds.ui.section;
 
 import com.flash3388.frc.ds.DependencyHolder;
 import com.flash3388.frc.ds.ui.view.ConnectionStatusView;
+import com.flash3388.frc.ds.ui.view.ControlConfigurationView;
 import com.flash3388.frc.ds.ui.view.MasterControlView;
 import javafx.stage.Stage;
 
@@ -35,7 +36,17 @@ public class ControlSection extends TabbedPane {
                         dependencyHolder.getRobotControl());
             }
         },
-        // CONFIGURATION VIEW
+        CONFIGURATION_VIEW {
+            @Override
+            public String displayName() {
+                return "Configuration";
+            }
+
+            @Override
+            public ViewController createController(Stage owner, DependencyHolder dependencyHolder) {
+                return new ControlConfigurationView();
+            }
+        }
         // HID VIEW
         ;
     }
