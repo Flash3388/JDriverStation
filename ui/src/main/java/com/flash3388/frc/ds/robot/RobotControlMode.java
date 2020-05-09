@@ -4,7 +4,7 @@ public enum RobotControlMode {
     TELEOPERATED {
         @Override
         public String displayName() {
-            return "OperatorControl";
+            return "Operator Control";
         }
     },
     AUTONOMOUS {
