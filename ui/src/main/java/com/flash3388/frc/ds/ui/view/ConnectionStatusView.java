@@ -58,7 +58,7 @@ public class ConnectionStatusView extends TabbedPane.ViewController {
         Button rebootRoborio = new Button("Reboot RoboRIO");
         rebootRoborio.setPrefSize(TOTAL_WIDTH / 2, 20);
         rebootRoborio.setOnAction((e)-> {
-            robotControl.rebootRoboRio();
+            robotControl.rebootRobot();
         });
 
         Button restartCode = new Button("Restart Code");

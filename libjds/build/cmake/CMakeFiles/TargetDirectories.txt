@@ -1,0 +1,3 @@
+/home/tomtzook/projects/frc/jdriverstation/libjds/build/cmake/CMakeFiles/rebuild_cache.dir
+/home/tomtzook/projects/frc/jdriverstation/libjds/build/cmake/CMakeFiles/jds.dir
+/home/tomtzook/projects/frc/jdriverstation/libjds/build/cmake/CMakeFiles/edit_cache.dir

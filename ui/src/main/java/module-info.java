@@ -7,6 +7,7 @@ module driverstation.main {
     requires org.controlsfx.controls;
 
     requires driverstation.libcomp;
+    requires driverstation.api;
 
     exports com.flash3388.frc.ds;
     exports com.flash3388.frc.ds.ui;

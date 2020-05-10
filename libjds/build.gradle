@@ -1,0 +1,29 @@
+plugins {
+    id 'java-library'
+}
+
+sourceCompatibility = JavaVersion.VERSION_11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+}
+
+jar {
+    archiveBaseName.set('jds')
+
+    from (file("${project.buildDir.absolutePath}/cmake/libjds.so")) {
+        into "${archiveBaseName.get()}/linux64"
+    }
+
+    archiveFileName.set("${archiveBaseName.get()}.${archiveExtension.get()}")
+    destinationDirectory.set(project.buildDir)
+}
+
+apply from: rootProject.file('cmake.gradle')
+
+tasks.clean.dependsOn tasks.deleteBuildDirectory
+tasks.jar.dependsOn tasks.buildNatives

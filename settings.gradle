@@ -1,1 +1,1 @@
-include 'ui', 'libds', 'libcomp'
+include 'ui', 'libjds', 'libcomp'

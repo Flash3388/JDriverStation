@@ -13,10 +13,11 @@ dependencies {
 }
 
 jar {
-    from (file("${project.buildDir.absolutePath}/cmake/libcomp.so")) {
-        into 'linux64'
-    }
     archiveBaseName.set('comp')
+
+    from (file("${project.buildDir.absolutePath}/cmake/libcomp.so")) {
+        into "${archiveBaseName.get()}/linux64"
+    }
 
     archiveFileName.set("${archiveBaseName.get()}.${archiveExtension.get()}")
     destinationDirectory.set(project.buildDir)

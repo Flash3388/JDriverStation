@@ -5,7 +5,6 @@ import com.flash3388.frc.ds.robot.ConnectionStatus;
 import com.flash3388.frc.ds.robot.RobotControl;
 import com.flash3388.frc.ds.robot.RobotControlMode;
 import com.flash3388.frc.ds.robot.RobotPowerStatus;
-import com.flash3388.frc.ds.robot.RobotUsageStatus;
 import com.flash3388.frc.ds.ui.util.NodeHelper;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -85,7 +84,7 @@ public class BaseInfoSection extends AnchorPane {
 
         GridPane statusPane = new GridPane();
         statusPane.setGridLinesVisible(false);
-        statusPane.setAlignment(Pos.CENTER);
+        statusPane.setAlignment(Pos.CENTER_LEFT);
         statusPane.setHgap(10.0);
         statusPane.setVgap(1.0);
         statusPane.add(mCommunicationBox, 0, 0);
@@ -96,7 +95,7 @@ public class BaseInfoSection extends AnchorPane {
         statusPane.add(joystickLabel, 1, 2);
 
         mStatusTextLabel = new Label("----");
-        mStatusTextLabel.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.EXTRA_BOLD, 20));
+        mStatusTextLabel.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, 12));
         robotControl.controlModeProperty().addListener((obs, o, n)-> {
             setStatusText(n, robotControl.enabledProperty().get());
         });

@@ -11,6 +11,6 @@ public interface RobotControl {
     ObservableBooleanValue enabledProperty();
     ObservableValue<RobotControlMode> controlModeProperty();
 
-    void rebootRoboRio();
+    void rebootRobot();
     void restartCode();
 }

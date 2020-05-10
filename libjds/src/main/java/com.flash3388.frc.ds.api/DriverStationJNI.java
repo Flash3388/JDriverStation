@@ -1,0 +1,46 @@
+package com.flash3388.frc.ds.api;
+
+public class DriverStationJNI {
+
+    private DriverStationJNI() {}
+
+    public static native int isInitialized();
+    public static native int initialize();
+    public static native void close();
+
+    public static native int rebootRobot();
+    public static native int restartRobotCode();
+
+    public static native int setRobotEnabled(boolean enabled);
+    public static native int isRobotEnabled();
+    public static native int setControlMode(int controlMode);
+    public static native int getControlMode();
+
+    public static native int isEmergencyStopped();
+    public static native int setEmergencyStopped(boolean enabled);
+
+    public static native int configureProtocol(int protocol);
+
+    public static native int hasRobotCode();
+    public static native int isConnectedToFms();
+    public static native int isConnectedToRobot();
+    public static native int isConnectedToRadio();
+    public static native int getCpuUsage();
+    public static native int getRamUsage();
+    public static native int getDiskUsage();
+    public static native int getCanUsageUsage();
+    public static native float getRobotVoltage();
+    public static native float getMaximumRobotVoltage();
+
+    public static native String getStatusString();
+
+    public static native int setTeamNumber(int teamNumber);
+    public static native int getTeamNumber();
+    public static native int setTeamAlliance(int teamAlliance);
+    public static native int getTeamAlliance();
+    public static native int setTeamPosition(int teamPosition);
+    public static native int getTeamPosition();
+
+    public static native int getJoystickCount();
+
+}

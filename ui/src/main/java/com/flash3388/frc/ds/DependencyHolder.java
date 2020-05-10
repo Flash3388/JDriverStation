@@ -72,35 +72,4 @@ public class DependencyHolder {
     public ImageLoader getImageLoader() {
         return mImageLoader;
     }
-
-    public static DependencyHolder create(ExecutorService executorService, Clock clock, BatteryStatus batteryStatus, CpuStatus cpuStatus) {
-        return new DependencyHolder(
-                clock, new RobotControl() {
-                    @Override
-                    public void setEnabled(boolean enabled) { }
-                    @Override
-                    public void setControlMode(RobotControlMode controlMode) { }
-
-                    @Override
-                    public ObservableBooleanValue enabledProperty() {
-                        return null;
-                    }
-
-                    @Override
-                    public ObservableValue<RobotControlMode> controlModeProperty() {
-                        return null;
-                    }
-
-                    @Override
-                    public void rebootRoboRio() { }
-                    @Override
-                    public void restartCode() { }
-                },
-                new RobotPowerStatus(new SimpleDoubleProperty(), new SimpleDoubleProperty()),
-                new RobotUsageStatus(new SimpleDoubleProperty(), new SimpleDoubleProperty(), new SimpleDoubleProperty(), new SimpleDoubleProperty()),
-                new ConnectionStatus(new SimpleBooleanProperty(), new SimpleBooleanProperty(), new SimpleBooleanProperty()),
-                batteryStatus, cpuStatus,
-                new ImageLoader(DependencyHolder.class.getClassLoader())
-        );
-    }
 }
