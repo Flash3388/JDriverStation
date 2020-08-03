@@ -4,7 +4,7 @@ import com.castle.time.Clock;
 import com.castle.time.Time;
 import com.flash3388.frc.ds.computer.BatteryStatus;
 import com.flash3388.frc.ds.computer.CpuStatus;
-import com.flash3388.frc.ds.robot.RobotControl;
+import com.flash3388.frc.ds.robot.DriverStationControl;
 import com.flash3388.frc.ds.robot.RobotControlMode;
 import com.flash3388.frc.ds.robot.TeamStation;
 import com.flash3388.frc.ds.ui.section.TabbedPane;
@@ -50,7 +50,9 @@ public class MasterControlView extends TabbedPane.ViewController {
     private Time mStartEnabledTimestamp;
     private volatile Image mChargingImage;
 
-    public MasterControlView(RobotControl robotControl, BatteryStatus batteryStatus, CpuStatus cpuStatus, ImageLoader imageLoader, Clock clock) {
+    public MasterControlView(DriverStationControl driverStationControl,
+                             BatteryStatus batteryStatus, CpuStatus cpuStatus,
+                             ImageLoader imageLoader, Clock clock) {
         final double TOTAL_WIDTH = 350;
 
         mBatteryStatus = batteryStatus;
@@ -78,7 +80,7 @@ public class MasterControlView extends TabbedPane.ViewController {
         separator.setHalignment(HPos.CENTER);
         separator.setOrientation(Orientation.VERTICAL);
         root.getChildren().addAll(
-                createLeftSide(robotControl, TOTAL_WIDTH),
+                createLeftSide(driverStationControl, TOTAL_WIDTH),
                 separator,
                 createRightSize(TOTAL_WIDTH));
 
@@ -131,7 +133,7 @@ public class MasterControlView extends TabbedPane.ViewController {
         }
     }
 
-    private Node createLeftSide(RobotControl robotControl, double totalWidth) {
+    private Node createLeftSide(DriverStationControl driverStationControl, double totalWidth) {
         final double LEFT_WIDTH = totalWidth / 12 * 5;
         final Font CONTROL_BUTTON_FONT = Font.font(13);
         final Font CONTROL_MODE_FONT = Font.font(11);
@@ -144,7 +146,7 @@ public class MasterControlView extends TabbedPane.ViewController {
         enable.setToggleGroup(masterControlToggleGroup);
         enable.setOnAction((e)-> {
             mStartEnabledTimestamp = mClock.currentTime();
-            robotControl.setEnabled(true);
+            driverStationControl.setEnabled(true);
         });
         mDisable.setFont(CONTROL_BUTTON_FONT);
         mDisable.setTextFill(Color.RED);
@@ -152,7 +154,7 @@ public class MasterControlView extends TabbedPane.ViewController {
         mDisable.setToggleGroup(masterControlToggleGroup);
         mDisable.setSelected(true);
         mDisable.setOnAction((e)-> {
-            robotControl.setEnabled(false);
+            driverStationControl.setEnabled(false);
             mElapsedTimeLabel.setText("00:00.0");
             mStartEnabledTimestamp = null;
         });
@@ -181,7 +183,7 @@ public class MasterControlView extends TabbedPane.ViewController {
             }
 
             RobotControlMode controlMode = (RobotControlMode) n.getUserData();
-            robotControl.setControlMode(controlMode);
+            driverStationControl.setControlMode(controlMode);
         });
 
         AnchorPane left = new AnchorPane();
@@ -255,7 +257,7 @@ public class MasterControlView extends TabbedPane.ViewController {
 
         Label teamStationLabel = new Label("Team Station");
 
-        mTeamStationComboBox.getItems().addAll(TeamStation.getAll());
+        mTeamStationComboBox.getItems().addAll(TeamStation.values());
         mTeamStationComboBox.getSelectionModel().select(0);
         mTeamStationComboBox.setPrefWidth(RIGHT_WIDTH / 2);
 

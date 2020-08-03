@@ -1,10 +1,8 @@
 package com.flash3388.frc.ds.ui.section;
 
 import com.flash3388.frc.ds.DependencyHolder;
-import com.flash3388.frc.ds.robot.ConnectionStatus;
-import com.flash3388.frc.ds.robot.RobotControl;
+import com.flash3388.frc.ds.robot.DriverStationControl;
 import com.flash3388.frc.ds.robot.RobotControlMode;
-import com.flash3388.frc.ds.robot.RobotPowerStatus;
 import com.flash3388.frc.ds.ui.util.NodeHelper;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -35,17 +33,20 @@ public class BaseInfoSection extends AnchorPane {
     public BaseInfoSection(Stage owner, DependencyHolder dependencyHolder) {
         final double TOTAL_WIDTH = 200.0;
 
-        ConnectionStatus connectionStatus = dependencyHolder.getConnectionStatus();
-        RobotPowerStatus robotPowerStatus = dependencyHolder.getRobotPowerStatus();
-        RobotControl robotControl = dependencyHolder.getRobotControl();
+        DriverStationControl driverStationControl = dependencyHolder.getDriverStationControl();
 
         Font teamNumberFont = Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, 15);
         Label teamNumberLabel = new Label("Team #");
         teamNumberLabel.setFont(teamNumberFont);
         Label teamNumberValueLabel = new Label("0000");
         teamNumberValueLabel.setFont(teamNumberFont);
+        driverStationControl.teamNumberProperty().addListener((obs, o, n)-> {
+            teamNumberValueLabel.setText(String.valueOf(n.intValue()));
+        });
+        teamNumberValueLabel.setText(String.valueOf(driverStationControl.teamNumberProperty().get()));
 
         HBox voltageLevelBox = new HBox();
+
         mVoltageProgress = new ProgressBar(0.0);
         mVoltageProgress.setPrefWidth(50);
         mVoltageProgress.setPrefHeight(65);
@@ -55,15 +56,15 @@ public class BaseInfoSection extends AnchorPane {
         );
         voltageLevelBox.getChildren().add(mVoltageProgress);
         mVoltageLabel = new Label("--.--");
-        robotPowerStatus.voltageProperty().addListener((obs, o, n)-> {
-            setVoltage(n.doubleValue(), robotPowerStatus.maxVoltageProperty().get());
+        driverStationControl.voltageProperty().addListener((obs, o, n)-> {
+            setVoltage(n.doubleValue(), driverStationControl.maxVoltageProperty().get());
         });
 
         mCommunicationBox = new Rectangle();
         mCommunicationBox.setWidth(20);
         mCommunicationBox.setHeight(20);
         setRectangle(mCommunicationBox, false);
-        connectionStatus.robotConnectedProperty().addListener((obs, o, n)-> {
+        driverStationControl.robotConnectedProperty().addListener((obs, o, n)-> {
             setRectangle(mCommunicationBox, n);
             setVoltage(-1, 0);
         });
@@ -83,6 +84,7 @@ public class BaseInfoSection extends AnchorPane {
         Label joystickLabel = new Label("Joystick");
 
         GridPane statusPane = new GridPane();
+
         statusPane.setGridLinesVisible(false);
         statusPane.setAlignment(Pos.CENTER_LEFT);
         statusPane.setHgap(10.0);
@@ -96,13 +98,14 @@ public class BaseInfoSection extends AnchorPane {
 
         mStatusTextLabel = new Label("----");
         mStatusTextLabel.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, 12));
-        robotControl.controlModeProperty().addListener((obs, o, n)-> {
-            setStatusText(n, robotControl.enabledProperty().get());
+        driverStationControl.controlModeProperty().addListener((obs, o, n)-> {
+            setStatusText(n, driverStationControl.enabledProperty().get());
         });
-        robotControl.enabledProperty().addListener((obs, o, n)-> {
-            setStatusText(robotControl.controlModeProperty().getValue(), n);
+        driverStationControl.enabledProperty().addListener((obs, o, n)-> {
+            setStatusText(driverStationControl.controlModeProperty().getValue(), n);
         });
-        setStatusText(robotControl.controlModeProperty().getValue(), robotControl.enabledProperty().get());
+        setStatusText(driverStationControl.controlModeProperty().getValue(),
+                driverStationControl.enabledProperty().get());
 
         GridPane topPane = new GridPane();
         topPane.setGridLinesVisible(false);

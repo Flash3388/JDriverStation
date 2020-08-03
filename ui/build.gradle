@@ -12,6 +12,9 @@ dependencies {
     implementation project(':libcomp')
     implementation project(':libjds')
 
+    implementation group: 'com.flash3388.flashlib', name: 'flashlib', version: '2.0.0'
+    implementation group: 'net.sourceforge.argparse4j', name: 'argparse4j', version: '0.8.1'
+    implementation gson()
     implementation castle()
     implementation slf4jApi()
     implementation controlfx()
@@ -47,4 +50,5 @@ startScripts {
 
 run {
     jvmArgs '-Djdk.gtk.version=2'
+    args '--debug', '--nofiles'
 }

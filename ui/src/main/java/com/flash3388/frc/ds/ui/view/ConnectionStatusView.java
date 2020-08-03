@@ -1,9 +1,7 @@
 package com.flash3388.frc.ds.ui.view;
 
 import com.castle.time.Time;
-import com.flash3388.frc.ds.robot.ConnectionStatus;
-import com.flash3388.frc.ds.robot.RobotControl;
-import com.flash3388.frc.ds.robot.RobotUsageStatus;
+import com.flash3388.frc.ds.robot.DriverStationControl;
 import com.flash3388.frc.ds.ui.section.TabbedPane;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -16,9 +14,6 @@ import javafx.scene.layout.VBox;
 
 public class ConnectionStatusView extends TabbedPane.ViewController {
 
-    private final RobotUsageStatus mRobotUsageStatus;
-    private final ConnectionStatus mConnectionStatus;
-
     private final CheckBox mFmsConnected;
     private final CheckBox mRobotConnected;
     private final CheckBox mRadioConnected;
@@ -28,11 +23,8 @@ public class ConnectionStatusView extends TabbedPane.ViewController {
     private final Label mDiskUsage;
     private final Label mCanUtilization;
 
-    public ConnectionStatusView(RobotUsageStatus robotUsageStatus, ConnectionStatus connectionStatus, RobotControl robotControl) {
+    public ConnectionStatusView(DriverStationControl driverStationControl) {
         final double TOTAL_WIDTH = 350;
-
-        mRobotUsageStatus = robotUsageStatus;
-        mConnectionStatus = connectionStatus;
 
         mFmsConnected = new CheckBox();
         mFmsConnected.setDisable(true);
@@ -41,30 +33,30 @@ public class ConnectionStatusView extends TabbedPane.ViewController {
         mRadioConnected = new CheckBox();
         mRadioConnected.setDisable(true);
 
-        mFmsConnected.selectedProperty().bind(mConnectionStatus.fmsConnectedProperty());
-        mRobotConnected.selectedProperty().bind(mConnectionStatus.robotConnectedProperty());
-        mRadioConnected.selectedProperty().bind(mConnectionStatus.radioConnectedProperty());
+        mFmsConnected.selectedProperty().bind(driverStationControl.fmsConnectedProperty());
+        mRobotConnected.selectedProperty().bind(driverStationControl.robotConnectedProperty());
+        mRadioConnected.selectedProperty().bind(driverStationControl.radioConnectedProperty());
 
         mCpuUsage = new Label("0.0");
         mRamUsage = new Label("0.0");
         mDiskUsage = new Label("0.0");
         mCanUtilization = new Label("0.0");
 
-        mCpuUsage.textProperty().bind(mRobotUsageStatus.cpuUsageProperty().asString());
-        mRamUsage.textProperty().bind(mRobotUsageStatus.ramUsageProperty().asString());
-        mDiskUsage.textProperty().bind(mRobotUsageStatus.diskUsageProperty().asString());
-        mCanUtilization.textProperty().bind(mRobotUsageStatus.canUtilizationProperty().asString());
+        mCpuUsage.textProperty().bind(driverStationControl.cpuUsageProperty().asString());
+        mRamUsage.textProperty().bind(driverStationControl.ramUsageProperty().asString());
+        mDiskUsage.textProperty().bind(driverStationControl.diskUsageProperty().asString());
+        mCanUtilization.textProperty().bind(driverStationControl.canUtilizationProperty().asString());
 
         Button rebootRoborio = new Button("Reboot RoboRIO");
         rebootRoborio.setPrefSize(TOTAL_WIDTH / 2, 20);
         rebootRoborio.setOnAction((e)-> {
-            robotControl.rebootRobot();
+            driverStationControl.rebootRobot();
         });
 
         Button restartCode = new Button("Restart Code");
         restartCode.setPrefSize(TOTAL_WIDTH / 2, 20);
         restartCode.setOnAction((e)-> {
-            robotControl.restartCode();
+            driverStationControl.restartCode();
         });
 
         VBox buttons = new VBox();

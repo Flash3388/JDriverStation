@@ -16,38 +16,62 @@ import com.castle.time.Time;
 import com.castle.util.closeables.Closer;
 import com.castle.util.java.JavaSources;
 import com.castle.util.regex.Patterns;
+import com.flash3388.flashlib.util.logging.LogLevel;
+import com.flash3388.flashlib.util.logging.LoggerBuilder;
+import com.flash3388.flashlib.util.logging.jul.JsonFormatter;
 import com.flash3388.frc.ds.comp.ComputerStatus;
 import com.flash3388.frc.ds.computer.ComputerMonitor;
 import com.flash3388.frc.ds.computer.ComputerStatusContainer;
-import com.flash3388.frc.ds.robot.ConnectionStatus;
-import com.flash3388.frc.ds.robot.ConnectionStatusImpl;
-import com.flash3388.frc.ds.robot.RobotControl;
-import com.flash3388.frc.ds.robot.RobotControlImpl;
-import com.flash3388.frc.ds.robot.RobotControlMode;
-import com.flash3388.frc.ds.robot.RobotPowerStatus;
-import com.flash3388.frc.ds.robot.RobotPowerStatusImpl;
-import com.flash3388.frc.ds.robot.RobotUsageStatus;
-import com.flash3388.frc.ds.robot.RobotUsageStatusImpl;
+import com.flash3388.frc.ds.configuration.Configuration;
+import com.flash3388.frc.ds.configuration.ConfigurationFactory;
+import com.flash3388.frc.ds.robot.DriverStationControlImpl;
 import com.flash3388.frc.ds.robot.UpdateTask;
 import com.flash3388.frc.ds.ui.UserInterface;
 import com.flash3388.frc.ds.ui.WindowConfig;
+import com.flash3388.frc.ds.util.ErrorHandler;
 import com.flash3388.frc.ds.util.ImageLoader;
+import com.flash3388.frc.ds.util.LoggerErrorHandler;
 import com.flash3388.frc.ds.util.services.PeriodicTaskService;
+import net.sourceforge.argparse4j.ArgumentParsers;
+import net.sourceforge.argparse4j.inf.ArgumentParser;
+import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import net.sourceforge.argparse4j.inf.Namespace;
+import org.slf4j.Logger;
 
+import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.PathMatcher;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.regex.Pattern;
+
+import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
 
 public class Main {
 
     public static void main(String[] args) throws Exception {
+        ProgramOptions programOptions = handleArguments(args);
+
+        String path = System.getProperty("user.dir");
+        ProgramPaths programPaths = new ProgramPaths(path);
+
+        if (programOptions.canUseFiles()) {
+            programPaths.createDirectories();
+        }
+
+        Logger logger = createLogger(programPaths, programOptions);
+        ErrorHandler errorHandler = new LoggerErrorHandler(logger);
+
         loadNatives();
+
+        Configuration configuration = ConfigurationFactory.create(
+            programPaths.getConfigDataPath(), logger, errorHandler,
+                programOptions.canUseFiles());
 
         WindowConfig windowConfig = new WindowConfig(800, 300, false);
 
@@ -67,16 +91,13 @@ public class Main {
         services.add(computerMonitor.createService(executorService, ()-> Time.milliseconds(50)));
 
         com.flash3388.frc.ds.api.DriverStation driverStation = com.flash3388.frc.ds.api.DriverStation.getInstance();
-        RobotControlImpl robotControl = new RobotControlImpl(driverStation);
-        RobotPowerStatusImpl robotPowerStatus = new RobotPowerStatusImpl();
-        RobotUsageStatusImpl robotUsageStatus = new RobotUsageStatusImpl();
-        ConnectionStatusImpl connectionStatus = new ConnectionStatusImpl();
+        DriverStationControlImpl driverStationControl = new DriverStationControlImpl(driverStation, configuration);
         services.add(new PeriodicTaskService(executorService, ()->Time.milliseconds(50),
-                new UpdateTask(driverStation, robotControl, robotPowerStatus, robotUsageStatus, connectionStatus)));
+                new UpdateTask(driverStationControl)));
 
         DependencyHolder dependencyHolder = new DependencyHolder(
                 clock,
-                robotControl, robotPowerStatus, robotUsageStatus, connectionStatus,
+                driverStationControl,
                 computerStatusContainer, computerStatusContainer,
                 new ImageLoader(DependencyHolder.class.getClassLoader()));
 
@@ -96,6 +117,58 @@ public class Main {
                 t.printStackTrace();
             }
         }
+    }
+
+    private static ProgramOptions handleArguments(String[] args) throws ArgumentParserException {
+        ArgumentParser parser = ArgumentParsers.newFor("JDriverStation").build()
+                .defaultHelp(true)
+                .description("Control software for FRC robots");
+        parser.addArgument("-d", "--debug")
+                .required(false)
+                .action(storeTrue())
+                .help("Run in debug mode");
+        parser.addArgument("-n", "--nofiles")
+                .required(false)
+                .action(storeTrue())
+                .help("Run without outputting files, volatile mode");
+
+        int startArgsIndex = 0;
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].contains(Main.class.getName())) {
+                startArgsIndex = i;
+                break;
+            }
+        }
+        args = Arrays.copyOfRange(args, startArgsIndex+1, args.length);
+
+        System.out.println(Arrays.toString(args));
+        Namespace namespace = parser.parseArgs(args);
+
+        return new ProgramOptions(
+                namespace.getBoolean("debug"),
+                !namespace.getBoolean("nofiles")
+        );
+    }
+
+    private static Logger createLogger(ProgramPaths programPaths, ProgramOptions programOptions) throws IOException {
+        LoggerBuilder loggerBuilder = new LoggerBuilder("jdriverstation")
+                .enableConsoleLogging(true)
+                .setLogLevel(programOptions.isDebug() ? LogLevel.DEBUG : LogLevel.INFO);
+
+        if (programOptions.canUseFiles()) {
+            Date date = new Date();
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("hh_mm_ss");
+            String filePattern = String.format("%s/log_%s.%%g.log",
+                    programPaths.getLogFilesDir().toAbsolutePath().toString(), dateFormat.format(date));
+
+            loggerBuilder.enableFileLogging(true)
+                    .setFilePattern(filePattern)
+                    .setFileLogFormatter(new JsonFormatter())
+                    .enableDelegatedFileLogging(true);
+        }
+
+        return loggerBuilder.build();
     }
 
     private static void loadNatives() throws Exception {

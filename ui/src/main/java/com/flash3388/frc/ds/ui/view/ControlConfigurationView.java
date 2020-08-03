@@ -1,8 +1,9 @@
 package com.flash3388.frc.ds.ui.view;
 
 import com.castle.time.Time;
+import com.flash3388.frc.ds.api.DsProtocol;
 import com.flash3388.frc.ds.dashboard.DashboardType;
-import com.flash3388.frc.ds.robot.CommunicationProtocol;
+import com.flash3388.frc.ds.robot.DriverStationControl;
 import com.flash3388.frc.ds.ui.controls.NumericField;
 import com.flash3388.frc.ds.ui.section.TabbedPane;
 import com.flash3388.frc.ds.ui.util.NodeHelper;
@@ -16,14 +17,16 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class ControlConfigurationView extends TabbedPane.ViewController {
 
-    public ControlConfigurationView() {
+    public ControlConfigurationView(DriverStationControl driverStationControl) {
         final double TOTAL_WIDTH = 350;
         final Font TITLE_LABEL_FONT = Font.font(Font.getDefault().getFamily(),
                 FontWeight.BOLD, Font.getDefault().getSize());
 
-        Node left = createLeftSide(TOTAL_WIDTH, TITLE_LABEL_FONT);
+        Node left = createLeftSide(TOTAL_WIDTH, TITLE_LABEL_FONT, driverStationControl);
         Node right = createRightSide(TOTAL_WIDTH, TITLE_LABEL_FONT);
 
         FlowPane root = new FlowPane();
@@ -52,21 +55,45 @@ public class ControlConfigurationView extends TabbedPane.ViewController {
 
     }
 
-    private Node createLeftSide(double totalWidth, Font titleLabelFont) {
+    private Node createLeftSide(double totalWidth, Font titleLabelFont, DriverStationControl driverStationControl) {
         Label teamNumberLabel = new Label("Team Number");
         teamNumberLabel.setFont(titleLabelFont);
         NumericField teamNumberField = new NumericField(int.class);
-        //teamNumberField.valueProperty().bindBidirectional();
+        AtomicBoolean changeLock = new AtomicBoolean(false);
+        driverStationControl.teamNumberProperty().addListener((obs, o, n)-> {
+            if (changeLock.compareAndSet(false, true)) {
+                teamNumberField.textProperty().set(String.valueOf(n.intValue()));
+                teamNumberField.valueProperty().setValue(n);
+                changeLock.set(false);
+            }
+        });
+        teamNumberField.valueProperty().addListener((obs, o, n)-> {
+            if (changeLock.compareAndSet(false, true)) {
+                driverStationControl.teamNumberProperty().set(n.intValue());
+                changeLock.set(false);
+            }
+        });
+
+        teamNumberField.textProperty().set(String.valueOf(driverStationControl.teamNumberProperty().get()));
+        teamNumberField.valueProperty().setValue(driverStationControl.teamNumberProperty().get());
 
         Label dashboardTypeLabel = new Label("Dashboard Type");
         dashboardTypeLabel.setFont(titleLabelFont);
         ComboBox<DashboardType> dashboardTypeComboBox = new ComboBox<>();
         dashboardTypeComboBox.getItems().addAll(DashboardType.values());
+        dashboardTypeComboBox.getSelectionModel().selectedItemProperty().addListener((obs, o, n)-> {
+
+        });
+        dashboardTypeComboBox.getSelectionModel().select(DashboardType.defaultValue());
 
         Label protocolLabel = new Label("Protocol");
         protocolLabel.setFont(titleLabelFont);
-        ComboBox<CommunicationProtocol> protocolComboBox = new ComboBox<>();
-        protocolComboBox.getItems().addAll(CommunicationProtocol.values());
+        ComboBox<DsProtocol> protocolComboBox = new ComboBox<>();
+        protocolComboBox.getItems().addAll(DsProtocol.values());
+        protocolComboBox.getSelectionModel().selectedItemProperty().addListener((obs, o, n)-> {
+            driverStationControl.protocolProperty().setValue(n);
+        });
+        protocolComboBox.getSelectionModel().select(driverStationControl.protocolProperty().getValue());
 
         GridPane left = new GridPane();
         left.setGridLinesVisible(false);

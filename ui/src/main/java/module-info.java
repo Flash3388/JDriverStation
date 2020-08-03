@@ -3,8 +3,14 @@ module driverstation.main {
     requires javafx.graphics;
     requires javafx.base;
 
+    requires gson;
     requires castle;
     requires org.controlsfx.controls;
+    requires slf4j.api;
+    requires argparse4j;
+    requires flashlib;
+    requires java.logging;
+    requires java.sql;
 
     requires driverstation.libcomp;
     requires driverstation.api;

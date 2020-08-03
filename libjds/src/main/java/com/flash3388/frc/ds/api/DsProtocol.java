@@ -16,6 +16,10 @@ public enum DsProtocol {
         return mValue;
     }
 
+    public static DsProtocol defaultValue() {
+        return FRC2016;
+    }
+
     public static DsProtocol fromValue(int value) {
         for (DsProtocol protocol : values()) {
             if (protocol.value() == value) {

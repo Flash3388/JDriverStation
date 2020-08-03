@@ -19,7 +19,7 @@ public class ControlSection extends TabbedPane {
 
             @Override
             public ViewController createController(Stage owner, DependencyHolder dependencyHolder) {
-                return new MasterControlView(dependencyHolder.getRobotControl(),
+                return new MasterControlView(dependencyHolder.getDriverStationControl(),
                         dependencyHolder.getBatteryStatus(), dependencyHolder.getCpuStatus(),
                         dependencyHolder.getImageLoader(), dependencyHolder.getClock());
             }
@@ -32,8 +32,7 @@ public class ControlSection extends TabbedPane {
 
             @Override
             public ViewController createController(Stage owner, DependencyHolder dependencyHolder) {
-                return new ConnectionStatusView(dependencyHolder.getRobotUsageStatus(), dependencyHolder.getConnectionStatus(),
-                        dependencyHolder.getRobotControl());
+                return new ConnectionStatusView(dependencyHolder.getDriverStationControl());
             }
         },
         CONFIGURATION_VIEW {
@@ -44,7 +43,7 @@ public class ControlSection extends TabbedPane {
 
             @Override
             public ViewController createController(Stage owner, DependencyHolder dependencyHolder) {
-                return new ControlConfigurationView();
+                return new ControlConfigurationView(dependencyHolder.getDriverStationControl());
             }
         }
         // HID VIEW
