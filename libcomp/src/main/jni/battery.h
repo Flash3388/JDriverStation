@@ -3,7 +3,8 @@
 enum battery_powerstate {
     POWER_CHARGING = 0,
     POWER_CHARGED = 1,
-    POWER_DISCHARGING = 2
+    POWER_DISCHARGING = 2,
+    POWER_UNKNOWN = 3
 };
 
 struct battery_state {

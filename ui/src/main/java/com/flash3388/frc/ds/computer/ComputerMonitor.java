@@ -3,7 +3,8 @@ package com.flash3388.frc.ds.computer;
 import com.castle.concurrent.service.Service;
 import com.castle.time.Time;
 import com.flash3388.frc.ds.comp.ComputerStatus;
-import com.flash3388.frc.ds.util.services.PeriodicTaskService;
+//import com.flash3388.frc.ds.util.services.PeriodicTaskService;
+import com.castle.concurrent.service.PeriodicTaskService;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
@@ -23,7 +24,10 @@ public class ComputerMonitor {
     }
 
     public Service createService(ScheduledExecutorService executorService, Supplier<Time> runInterval) {
-        return new PeriodicTaskService(executorService, runInterval,
-                new UpdateTask(mComputerStatus, mComputerStatusContainer));
+        /*return new PeriodicTaskService(executorService, runInterval,
+                new UpdateTask(mComputerStatus, mComputerStatusContainer));*/
+        return new PeriodicTaskService(executorService,
+                new UpdateTask(mComputerStatus, mComputerStatusContainer),
+                runInterval);
     }
 }

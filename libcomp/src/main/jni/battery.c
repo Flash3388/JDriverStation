@@ -89,8 +89,7 @@ static int read_charge_status(const char* data_dir,
     } else if (strcmp(buffer, CHARGE_STATUS_FULL) == 0) {
         *charge_status = POWER_CHARGED;
     } else {
-        result = ERROR_CHARGE_STATUS_UNKNOWN;
-        goto clean;
+        *charge_status = POWER_UNKNOWN;
     }
 
 clean:
@@ -98,9 +97,9 @@ clean:
 
     return result;
 }
-
+#include<stdio.h>
 int battery_get_state(struct battery_state* battery_state) {
-    DIR* directory;
+    DIR* directory = NULL;
     struct dirent* dirent;
     char buffer[PATH_MAX];
     int result = 0;
@@ -109,24 +108,21 @@ int battery_get_state(struct battery_state* battery_state) {
 
     bool data_found = false;
 
+    if (regcomp(&regex, "BAT[0-9]+", REG_EXTENDED) != 0) {
+        return ERROR_REGEX_COMPILE;
+    }
+
     if ((directory = opendir(DATADIR)) == NULL) {
-        return ERROR_FOLDER_NOT_FOUND;
+        result = ERROR_FOLDER_NOT_FOUND;
+        goto clean;
     }
 
     while ((dirent = readdir(directory)) != NULL) {
         snprintf(buffer, PATH_MAX, "%s/%s", DATADIR, dirent->d_name);
 
-        if (regcomp(&regex, "BAT[0-9]+", REG_EXTENDED) != 0) {
-            result = ERROR_REGEX_COMPILE;
-            goto clean;
-        }
-
         if (regexec(&regex, dirent->d_name, 0, NULL, 0) != 0) {
-            regfree(&regex);
             continue;
         }
-
-        regfree(&regex);
 
         result = read_charge_level(DATADIR, dirent->d_name,
                                    buffer, &battery_state->chargelevel);
@@ -147,6 +143,7 @@ int battery_get_state(struct battery_state* battery_state) {
     }
 
 clean:
+    regfree(&regex);
     if (directory != NULL) closedir(directory);
 
     return result;

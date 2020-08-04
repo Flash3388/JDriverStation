@@ -16,7 +16,7 @@ jar {
     archiveBaseName.set('jds')
 
     from (file("${project.buildDir.absolutePath}/cmake/libjds.so")) {
-        into "${archiveBaseName.get()}/linux64"
+        into "${archiveBaseName.get()}/linux/amd64"
     }
 
     archiveFileName.set("${archiveBaseName.get()}.${archiveExtension.get()}")

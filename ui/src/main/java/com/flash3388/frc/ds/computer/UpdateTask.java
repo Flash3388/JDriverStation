@@ -3,6 +3,7 @@ package com.flash3388.frc.ds.computer;
 import com.flash3388.frc.ds.comp.BatteryState;
 import com.flash3388.frc.ds.comp.ComputerStatus;
 import com.flash3388.frc.ds.comp.ChargeState;
+import com.flash3388.frc.ds.comp.NativeException;
 
 public class UpdateTask implements Runnable {
 
@@ -16,11 +17,19 @@ public class UpdateTask implements Runnable {
 
     @Override
     public void run() {
-        BatteryState batteryState = mComputerStatus.getBatteryState();
-        mComputerStatusContainer.levelProperty().set(batteryState.getChargeLevel());
-        mComputerStatusContainer.isChargingProperty().set(batteryState.getChargeState() != ChargeState.POWER_DISCHARGING);
+        try {
+            BatteryState batteryState = mComputerStatus.getBatteryState();
+            mComputerStatusContainer.levelProperty().set(batteryState.getChargeLevel());
+            mComputerStatusContainer.isChargingProperty().set(
+                    batteryState.getChargeState() != ChargeState.POWER_DISCHARGING &&
+                            batteryState.getChargeState() != ChargeState.POWER_UNKNOWN);
+        } catch (NativeException e) {
+        }
 
-        double cpuUsage = mComputerStatus.getCpuUsage();
-        mComputerStatusContainer.usageProperty().set(cpuUsage);
+        try {
+            double cpuUsage = mComputerStatus.getCpuUsage();
+            mComputerStatusContainer.usageProperty().set(cpuUsage);
+        } catch (NativeException e) {
+        }
     }
 }

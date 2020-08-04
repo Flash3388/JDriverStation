@@ -3,7 +3,7 @@ ext {
         return 'edu.wpi.first.ntcore:ntcore-java:2019.4.1'
     }
     castle = {
-        return 'com.github.tomtzook:castle:1.0.0-beta-SNAPSHOT'
+        return 'com.github.tomtzook:castle:1.0.0'
     }
     controlfx = {
         return 'org.controlsfx:controlsfx:11.0.1'

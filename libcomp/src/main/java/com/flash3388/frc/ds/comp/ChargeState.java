@@ -3,7 +3,8 @@ package com.flash3388.frc.ds.comp;
 public enum ChargeState {
     POWER_CHARGING(0),
     POWER_CHARGED(1),
-    POWER_DISCHARGING(2)
+    POWER_DISCHARGING(2),
+    POWER_UNKNOWN(3)
     ;
 
     private final int mValue;

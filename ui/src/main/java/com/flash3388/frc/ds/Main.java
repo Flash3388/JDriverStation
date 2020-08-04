@@ -1,12 +1,11 @@
 package com.flash3388.frc.ds;
 
 import com.castle.code.NativeLibrary;
-import com.castle.code.NativeLibraryFinder;
+import com.castle.code.finder.NativeLibraryFinder;
 import com.castle.code.loader.NativeLibraryLoader;
 import com.castle.code.loader.TempNativeLibraryLoader;
 import com.castle.concurrent.service.Service;
 import com.castle.nio.PathMatching;
-import com.castle.nio.temp.TempPathGenerator;
 import com.castle.nio.zip.ArchivedNativeLibraryFinder;
 import com.castle.nio.zip.OpenZip;
 import com.castle.nio.zip.Zip;
@@ -49,6 +48,7 @@ import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.regex.Pattern;
 
 import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
 
@@ -177,19 +177,21 @@ public class Main {
     }
 
     private static void loadNativesFromJar(Class<?> classInJar, String prefixPackage, Collection<String> libs) throws Exception {
-        Zip zip = JavaSources.currentJar(classInJar);
-        Path basePath;
+        Zip zip = JavaSources.containingJar(classInJar);
+
         try (OpenZip openZip = zip.open()) {
-            basePath = openZip.pathFinder().findAll(Patterns.wrapWithWildcards(prefixPackage),
-                    PathMatching.directoryMatcher()).iterator().next();
-        }
+            Path basePath = openZip.pathFinder().findAll(
+                    Patterns.wrapWithWildcards(prefixPackage),
+                    PathMatching.directoryMatcher())
+                    .iterator().next();
 
-        NativeLibraryLoader nativeLibraryLoader = new TempNativeLibraryLoader(new TempPathGenerator());
-        NativeLibraryFinder nativeLibraryFinder = new ArchivedNativeLibraryFinder(zip, basePath);
+            NativeLibraryLoader nativeLibraryLoader = new TempNativeLibraryLoader();
+            NativeLibraryFinder nativeLibraryFinder = new ArchivedNativeLibraryFinder(zip, basePath);
 
-        for (String lib : libs) {
-            NativeLibrary nativeLibrary = nativeLibraryFinder.find(lib);
-            nativeLibraryLoader.load(nativeLibrary);
+            for (String lib : libs) {
+                NativeLibrary nativeLibrary = nativeLibraryFinder.find(lib);
+                nativeLibraryLoader.load(nativeLibrary);
+            }
         }
     }
 }
