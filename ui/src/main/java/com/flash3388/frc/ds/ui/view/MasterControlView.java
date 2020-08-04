@@ -15,6 +15,7 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -36,35 +37,41 @@ public class MasterControlView extends TabbedPane.ViewController {
 
     private static final String CHARGING_IMAGE_RESOURCE = "charging.png";
 
+    private final DriverStationControl mDriverStationControl;
     private final BatteryStatus mBatteryStatus;
     private final ImageLoader mImageLoader;
     private final Clock mClock;
 
-    private final ToggleButton mDisable;
+    private final Button mEnable;
+    private final Button mDisable;
     private final Label mElapsedTimeLabel;
     private final ImageView mBatteryChargingIcon;
     private final ProgressBar mBatteryLevel;
     private final ProgressBar mCpuUsage;
     private final ComboBox<TeamStation> mTeamStationComboBox;
 
-    private Time mStartEnabledTimestamp;
+    private volatile Time mStartEnabledTimestamp;
     private volatile Image mChargingImage;
+    private volatile boolean mIsDisabled;
 
     public MasterControlView(DriverStationControl driverStationControl,
                              BatteryStatus batteryStatus, CpuStatus cpuStatus,
                              ImageLoader imageLoader, Clock clock) {
         final double TOTAL_WIDTH = 350;
 
+        mDriverStationControl = driverStationControl;
         mBatteryStatus = batteryStatus;
         mImageLoader = imageLoader;
         mClock = clock;
 
-        mDisable = new ToggleButton("Disable");
+        mEnable = new Button("Enable");
+        mDisable = new Button("Disable");
         mElapsedTimeLabel = new Label("00:00.0");
         mBatteryChargingIcon = new ImageView();
         mBatteryLevel = new ProgressBar();
         mCpuUsage = new ProgressBar();
         mTeamStationComboBox = new ComboBox<>();
+        mIsDisabled = true;
 
         mBatteryStatus.isChargingProperty().addListener((obs, o, n)-> {
             setIsCharging(n);
@@ -103,14 +110,12 @@ public class MasterControlView extends TabbedPane.ViewController {
 
     @Override
     protected void stopUsing() {
-        if (!mDisable.isSelected()) {
-            mDisable.setSelected(true);
-        }
+        disableRun();
     }
 
     @Override
     public void update(Time timePassed) {
-        if (!mDisable.isSelected() && mStartEnabledTimestamp != null) {
+        if (!mIsDisabled && mStartEnabledTimestamp != null) {
             Time delta = mClock.currentTime().sub(mStartEnabledTimestamp).toUnit(TimeUnit.MILLISECONDS);
 
             Time deltaAsSeconds = delta.toUnit(TimeUnit.SECONDS);
@@ -133,35 +138,49 @@ public class MasterControlView extends TabbedPane.ViewController {
         }
     }
 
+    private void disableRun() {
+        mDriverStationControl.setEnabled(false);
+    }
+
     private Node createLeftSide(DriverStationControl driverStationControl, double totalWidth) {
         final double LEFT_WIDTH = totalWidth / 12 * 5;
         final Font CONTROL_BUTTON_FONT = Font.font(13);
         final Font CONTROL_MODE_FONT = Font.font(11);
 
-        ToggleGroup masterControlToggleGroup = new ToggleGroup();
-        ToggleButton enable = new ToggleButton("Enable");
-        enable.setFont(CONTROL_BUTTON_FONT);
-        enable.setTextFill(Color.GREEN);
-        enable.setPrefSize(LEFT_WIDTH / 2, 50);
-        enable.setToggleGroup(masterControlToggleGroup);
-        enable.setOnAction((e)-> {
-            mStartEnabledTimestamp = mClock.currentTime();
-            driverStationControl.setEnabled(true);
+        mEnable.setFont(CONTROL_BUTTON_FONT);
+        mEnable.setTextFill(Color.GREEN);
+        mEnable.setPrefSize(LEFT_WIDTH / 2, 50);
+        mEnable.setOnAction((e)-> {
+            if (driverStationControl.canEnableRobot()) {
+                driverStationControl.setEnabled(true);
+            }
         });
         mDisable.setFont(CONTROL_BUTTON_FONT);
         mDisable.setTextFill(Color.RED);
         mDisable.setPrefSize(LEFT_WIDTH / 2, 50);
-        mDisable.setToggleGroup(masterControlToggleGroup);
-        mDisable.setSelected(true);
+        mDisable.setDisable(true);
         mDisable.setOnAction((e)-> {
             driverStationControl.setEnabled(false);
-            mElapsedTimeLabel.setText("00:00.0");
-            mStartEnabledTimestamp = null;
+        });
+
+        driverStationControl.enabledProperty().addListener((obs, o, n)-> {
+            if (!o && n) {
+                mStartEnabledTimestamp = mClock.currentTime();
+                mEnable.setDisable(true);
+                mDisable.setDisable(false);
+                mIsDisabled = false;
+            } else if (!n && o) {
+                mElapsedTimeLabel.setText("00:00.0");
+                mStartEnabledTimestamp = null;
+                mEnable.setDisable(false);
+                mDisable.setDisable(true);
+                mIsDisabled = true;
+            }
         });
 
         HBox masterControlButtons = new HBox();
         masterControlButtons.setSpacing(1.0);
-        masterControlButtons.getChildren().addAll(enable, mDisable);
+        masterControlButtons.getChildren().addAll(mEnable, mDisable);
 
         VBox controlTypes = new VBox();
         controlTypes.setSpacing(1.0);
@@ -178,9 +197,7 @@ public class MasterControlView extends TabbedPane.ViewController {
         }
         controlTypeToggleGroup.getToggles().get(0).setSelected(true);
         controlTypeToggleGroup.selectedToggleProperty().addListener((obs, o, n)-> {
-            if (enable.isSelected()) {
-                mDisable.setSelected(true);
-            }
+            disableRun();
 
             RobotControlMode controlMode = (RobotControlMode) n.getUserData();
             driverStationControl.setControlMode(controlMode);

@@ -74,6 +74,9 @@ public class BaseInfoSection extends AnchorPane {
         mCodeBox.setWidth(20);
         mCodeBox.setHeight(20);
         setRectangle(mCodeBox, false);
+        driverStationControl.robotHasCodeProperty().addListener((obs, o, n)-> {
+            setRectangle(mCodeBox, n);
+        });
         Label codeLabel = new Label("Code");
 
         mJoystickBox = new Rectangle();

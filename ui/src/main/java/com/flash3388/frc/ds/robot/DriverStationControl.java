@@ -12,6 +12,7 @@ public interface DriverStationControl {
     ObservableBooleanValue fmsConnectedProperty();
     ObservableBooleanValue robotConnectedProperty();
     ObservableBooleanValue radioConnectedProperty();
+    ObservableBooleanValue robotHasCodeProperty();
 
     void setEnabled(boolean enabled);
     void setControlMode(RobotControlMode controlMode);
@@ -31,4 +32,6 @@ public interface DriverStationControl {
     ReadOnlyDoubleProperty ramUsageProperty();
     ReadOnlyDoubleProperty diskUsageProperty();
     ReadOnlyDoubleProperty canUtilizationProperty();
+
+    boolean canEnableRobot();
 }

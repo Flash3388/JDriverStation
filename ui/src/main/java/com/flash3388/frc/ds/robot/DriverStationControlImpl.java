@@ -11,12 +11,10 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.Property;
-import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableBooleanValue;
-import javafx.beans.value.ObservableValue;
 
 import java.io.IOException;
 
@@ -27,6 +25,7 @@ public class DriverStationControlImpl implements DriverStationControl {
     private final BooleanProperty mFms;
     private final BooleanProperty mRobot;
     private final BooleanProperty mRadio;
+    private final BooleanProperty mHasCode;
 
     private final BooleanProperty mEnabled;
     private final Property<RobotControlMode> mRobotControlMode;
@@ -49,6 +48,7 @@ public class DriverStationControlImpl implements DriverStationControl {
         mFms = new SimpleBooleanProperty();
         mRobot = new SimpleBooleanProperty();
         mRadio = new SimpleBooleanProperty();
+        mHasCode = new SimpleBooleanProperty();
 
         mEnabled = new SimpleBooleanProperty();
         mRobotControlMode = new SimpleObjectProperty<>(RobotControlMode.TELEOPERATED);
@@ -78,10 +78,17 @@ public class DriverStationControlImpl implements DriverStationControl {
     public BooleanProperty radioConnectedProperty() {
         return mRadio;
     }
+    @Override
+    public BooleanProperty robotHasCodeProperty() {
+        return mHasCode;
+    }
 
     @Override
     public void setEnabled(boolean enabled) {
         mDriverStation.setRobotEnabled(enabled);
+    }
+    public boolean canEnableRobot() {
+        return robotConnectedProperty().get() && robotHasCodeProperty().get();
     }
     @Override
     public void setControlMode(RobotControlMode controlMode) {
@@ -144,6 +151,11 @@ public class DriverStationControlImpl implements DriverStationControl {
     }
 
     void update() {
+        fmsConnectedProperty().set(mDriverStation.isConnectedToFms());
+        robotConnectedProperty().set(mDriverStation.isConnectedToRobot());
+        radioConnectedProperty().set(mDriverStation.isConnectedToRadio());
+        robotHasCodeProperty().set(mDriverStation.hasRobotCode());
+
         enabledProperty().set(mDriverStation.isRobotEnabled());
         controlModeProperty().setValue(RobotControlMode.fromDsControlMode(mDriverStation.getControlMode()));
 
@@ -154,10 +166,6 @@ public class DriverStationControlImpl implements DriverStationControl {
         ramUsageProperty().set(mDriverStation.getRamUsage());
         diskUsageProperty().set(mDriverStation.getDiskUsage());
         canUtilizationProperty().set(mDriverStation.getCanUsage());
-
-        fmsConnectedProperty().set(mDriverStation.isConnectedToFms());
-        robotConnectedProperty().set(mDriverStation.isConnectedToRobot());
-        radioConnectedProperty().set(mDriverStation.isConnectedToRadio());
 
         //teamNumberProperty().set(mDriverStation.getTeamNumber());
         teamStationProperty().setValue(
