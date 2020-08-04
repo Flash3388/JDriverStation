@@ -10,6 +10,7 @@ import com.castle.nio.zip.ArchivedNativeLibraryFinder;
 import com.castle.nio.zip.OpenZip;
 import com.castle.nio.zip.Zip;
 import com.castle.time.Clock;
+import com.castle.time.Clocks;
 import com.castle.time.SystemMillisClock;
 import com.castle.time.Time;
 import com.castle.util.closeables.Closer;
@@ -75,7 +76,7 @@ public class Main {
 
         WindowConfig windowConfig = new WindowConfig(800, 300, false);
 
-        Clock clock = new SystemMillisClock();
+        Clock clock = Clocks.systemNanosClock();
 
         Closer closer = Closer.empty();
         CountDownLatch runLatch = new CountDownLatch(1);
