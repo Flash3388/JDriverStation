@@ -8,12 +8,10 @@ import com.castle.concurrent.service.Service;
 import com.castle.nio.PathMatching;
 import com.castle.nio.temp.TempPath;
 import com.castle.nio.temp.TempPathGenerator;
-import com.castle.nio.zip.ArchivedNativeLibraryFinder;
 import com.castle.nio.zip.OpenZip;
 import com.castle.nio.zip.Zip;
 import com.castle.time.Clock;
 import com.castle.time.Clocks;
-import com.castle.time.SystemMillisClock;
 import com.castle.time.Time;
 import com.castle.util.closeables.Closer;
 import com.castle.util.java.JavaSources;
@@ -35,12 +33,13 @@ import com.flash3388.frc.ds.util.ErrorHandler;
 import com.flash3388.frc.ds.util.ImageLoader;
 import com.flash3388.frc.ds.util.LoggerErrorHandler;
 import com.flash3388.frc.ds.util.services.PeriodicTaskService;
+import com.notifier.Controllers;
+import com.notifier.EventController;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.slf4j.Logger;
-import sdl2.SDL;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,7 +56,6 @@ import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.regex.Pattern;
 
 import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
 
@@ -93,10 +91,11 @@ public class Main {
 
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(8);
         closer.add(executorService::shutdownNow);
+        EventController eventController = Controllers.newExecutorBasedController(executorService);
 
         Collection<Service> services = new ArrayList<>();
 
-        ComputerStatusContainer computerStatusContainer = new ComputerStatusContainer();
+        ComputerStatusContainer computerStatusContainer = new ComputerStatusContainer(eventController);
         ComputerMonitor computerMonitor = new ComputerMonitor(computerStatusContainer);
         services.add(computerMonitor.createService(executorService, ()-> Time.milliseconds(50)));
 
@@ -108,7 +107,7 @@ public class Main {
         DependencyHolder dependencyHolder = new DependencyHolder(
                 clock,
                 driverStationControl,
-                computerStatusContainer, computerStatusContainer,
+                computerStatusContainer, computerStatusContainer, computerStatusContainer,
                 new ImageLoader(DependencyHolder.class.getClassLoader()));
 
         UserInterface userInterface = new UserInterface(executorService, windowConfig, dependencyHolder, runLatch::countDown);

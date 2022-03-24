@@ -13,6 +13,7 @@ module driverstation.main {
     requires java.sql;
     requires jsdl2;
     requires jsdl2.jni;
+    requires notifier;
 
     requires driverstation.libcomp;
     requires driverstation.api;

@@ -3,6 +3,7 @@ package com.flash3388.frc.ds.ui.section;
 import com.flash3388.frc.ds.DependencyHolder;
 import com.flash3388.frc.ds.ui.view.ConnectionStatusView;
 import com.flash3388.frc.ds.ui.view.ControlConfigurationView;
+import com.flash3388.frc.ds.ui.view.HidStatusView;
 import com.flash3388.frc.ds.ui.view.MasterControlView;
 import javafx.stage.Stage;
 
@@ -45,8 +46,18 @@ public class ControlSection extends TabbedPane {
             public ViewController createController(Stage owner, DependencyHolder dependencyHolder) {
                 return new ControlConfigurationView(dependencyHolder.getDriverStationControl());
             }
+        },
+        HID_VIEW {
+            @Override
+            public String displayName() {
+                return "HID";
+            }
+
+            @Override
+            public ViewController createController(Stage owner, DependencyHolder dependencyHolder) {
+                return new HidStatusView(dependencyHolder.getHidStatus());
+            }
         }
-        // HID VIEW
         ;
     }
 

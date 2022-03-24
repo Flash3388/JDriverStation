@@ -22,9 +22,11 @@ dependencies {
     implementation castle()
     implementation slf4jApi()
     implementation controlfx()
+    implementation notifier()
 
-    implementation 'com.github.tomtzook:jsdl2:0.1.0'
-    compileExternal group: 'com.github.tomtzook', name: 'jsdl2-jni', version: '0.1.0', classifier: 'linux-amd64'
+    def jsdl2Version = '0.2.0'
+    implementation group: 'com.github.tomtzook', name: 'jsdl2', version: jsdl2Version
+    compileExternal group: 'com.github.tomtzook', name: 'jsdl2-jni', version: jsdl2Version, classifier: 'linux-amd64'
 
     testImplementation junit()
     testImplementation mockito()

@@ -41,6 +41,13 @@ public class DriverStationJNI {
     public static native int setTeamPosition(int teamPosition);
     public static native int getTeamPosition();
 
+    public static native void resetJoysticks();
+    public static native void addJoystick(int axes, int buttons, int hats);
     public static native int getJoystickCount();
-
+    public static native float getJoystickAxis(int index, int axis);
+    public static native boolean getJoystickButton(int index, int button);
+    public static native int getJoystickHat(int index, int hat);
+    public static native void setJoystickAxis(int index, int axis, float value);
+    public static native void setJoystickButton(int index, int button, boolean value);
+    public static native void setJoystickHat(int index, int hat, int angle);
 }
