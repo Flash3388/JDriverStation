@@ -1,5 +1,7 @@
 package com.flash3388.frc.ds.api;
 
+import com.flash3388.frc.ds.api.events.DsEvent;
+
 public class DriverStationJNI {
 
     private DriverStationJNI() {}
@@ -12,7 +14,7 @@ public class DriverStationJNI {
     public static native int restartRobotCode();
 
     public static native int setRobotEnabled(boolean enabled);
-    public static native int isRobotEnabled();
+    public static native boolean isRobotEnabled();
     public static native int setControlMode(int controlMode);
     public static native int getControlMode();
 
@@ -21,14 +23,14 @@ public class DriverStationJNI {
 
     public static native int configureProtocol(int protocol);
 
-    public static native int hasRobotCode();
-    public static native int isConnectedToFms();
-    public static native int isConnectedToRobot();
-    public static native int isConnectedToRadio();
+    public static native boolean hasRobotCode();
+    public static native boolean isConnectedToFms();
+    public static native boolean isConnectedToRobot();
+    public static native boolean isConnectedToRadio();
     public static native int getCpuUsage();
     public static native int getRamUsage();
     public static native int getDiskUsage();
-    public static native int getCanUsageUsage();
+    public static native int getCanUsage();
     public static native float getRobotVoltage();
     public static native float getMaximumRobotVoltage();
 
@@ -50,4 +52,6 @@ public class DriverStationJNI {
     public static native void setJoystickAxis(int index, int axis, float value);
     public static native void setJoystickButton(int index, int button, boolean value);
     public static native void setJoystickHat(int index, int hat, int angle);
+
+    public static native DsEvent pollEvent();
 }

@@ -200,7 +200,7 @@ public class MasterControlView extends TabbedPane.ViewController {
             disableRun();
 
             RobotControlMode controlMode = (RobotControlMode) n.getUserData();
-            driverStationControl.setControlMode(controlMode);
+            driverStationControl.setControlMode(controlMode.toDsControlMode());
         });
 
         AnchorPane left = new AnchorPane();
@@ -277,6 +277,9 @@ public class MasterControlView extends TabbedPane.ViewController {
         mTeamStationComboBox.getItems().addAll(TeamStation.values());
         mTeamStationComboBox.getSelectionModel().select(0);
         mTeamStationComboBox.setPrefWidth(RIGHT_WIDTH / 2);
+        mDriverStationControl.teamStationProperty().addListener((obs, o, n)-> {
+            mTeamStationComboBox.getSelectionModel().select(n);
+        });
 
         root.add(teamStationLabel, LABEL_COLUMN, 8);
         root.add(mTeamStationComboBox, CONTENT_COLUMN, 8);

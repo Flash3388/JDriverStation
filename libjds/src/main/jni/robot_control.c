@@ -30,7 +30,7 @@ Java_com_flash3388_frc_ds_api_DriverStationJNI_setRobotEnabled
 }
 
 
-JNIEXPORT jint JNICALL
+JNIEXPORT jboolean JNICALL
 Java_com_flash3388_frc_ds_api_DriverStationJNI_isRobotEnabled
         (JNIEnv *env, jclass obj) {
 

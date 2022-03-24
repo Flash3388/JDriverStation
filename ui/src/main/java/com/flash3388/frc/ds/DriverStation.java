@@ -17,8 +17,8 @@ public class DriverStation {
     }
 
     public void start() throws LaunchException {
-        mServices.forEach(Service::start);
         mUserInterface.launch();
+        mServices.forEach(Service::start);
     }
 
     public void stop() {

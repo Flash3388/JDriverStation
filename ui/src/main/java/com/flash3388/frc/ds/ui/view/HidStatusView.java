@@ -28,13 +28,19 @@ import java.util.List;
 
 public class HidStatusView extends TabbedPane.ViewController {
 
+    private final HidStatus mHidStatus;
+    private final ListView<Container> mListView;
+
     private final FlowPane mAxisViewsPane;
     private final FlowPane mButtonsViewsPane;
     private final FlowPane mHatsViewsPane;
     private final List<JoystickControlView> mViews;
 
     public HidStatusView(HidStatus hidStatus) {
+        mHidStatus = hidStatus;
+
         ListView<Container> listView = new ListView<>();
+        mListView = listView;
         listView.setCellFactory(param -> new JoystickCell(hidStatus));
 
         mAxisViewsPane = new FlowPane();
@@ -115,10 +121,6 @@ public class HidStatusView extends TabbedPane.ViewController {
             });
             listView.refresh();
         });
-        for (Joystick joystick : hidStatus.getJoysticks()) {
-            listView.getItems().get(joystick.indexProperty().get()).data = joystick;
-        }
-        listView.refresh();
 
         HBox root = new HBox();
         root.getChildren().addAll(listView, viewsRoot);
@@ -129,7 +131,10 @@ public class HidStatusView extends TabbedPane.ViewController {
 
     @Override
     protected void startUsing() throws Exception {
-
+        for (Joystick joystick : mHidStatus.getJoysticks()) {
+            mListView.getItems().get(joystick.indexProperty().get()).data = joystick;
+        }
+        mListView.refresh();
     }
 
     @Override

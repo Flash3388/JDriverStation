@@ -59,23 +59,13 @@ public class ControlConfigurationView extends TabbedPane.ViewController {
         Label teamNumberLabel = new Label("Team Number");
         teamNumberLabel.setFont(titleLabelFont);
         NumericField teamNumberField = new NumericField(int.class);
-        AtomicBoolean changeLock = new AtomicBoolean(false);
         driverStationControl.teamNumberProperty().addListener((obs, o, n)-> {
-            if (changeLock.compareAndSet(false, true)) {
-                teamNumberField.textProperty().set(String.valueOf(n.intValue()));
-                teamNumberField.valueProperty().setValue(n);
-                changeLock.set(false);
-            }
+            teamNumberField.textProperty().set(String.valueOf(n.intValue()));
+            teamNumberField.valueProperty().setValue(n);
         });
         teamNumberField.valueProperty().addListener((obs, o, n)-> {
-            if (changeLock.compareAndSet(false, true)) {
-                driverStationControl.teamNumberProperty().set(n.intValue());
-                changeLock.set(false);
-            }
+            driverStationControl.setTeamNumber(n.intValue());
         });
-
-        teamNumberField.textProperty().set(String.valueOf(driverStationControl.teamNumberProperty().get()));
-        teamNumberField.valueProperty().setValue(driverStationControl.teamNumberProperty().get());
 
         Label dashboardTypeLabel = new Label("Dashboard Type");
         dashboardTypeLabel.setFont(titleLabelFont);
@@ -91,9 +81,11 @@ public class ControlConfigurationView extends TabbedPane.ViewController {
         ComboBox<DsProtocol> protocolComboBox = new ComboBox<>();
         protocolComboBox.getItems().addAll(DsProtocol.values());
         protocolComboBox.getSelectionModel().selectedItemProperty().addListener((obs, o, n)-> {
-            driverStationControl.protocolProperty().setValue(n);
+            driverStationControl.setProtocol(n);
         });
-        protocolComboBox.getSelectionModel().select(driverStationControl.protocolProperty().getValue());
+        driverStationControl.protocolProperty().addListener((obs, o, n)-> {
+            protocolComboBox.getSelectionModel().select(n);
+        });
 
         GridPane left = new GridPane();
         left.setGridLinesVisible(false);

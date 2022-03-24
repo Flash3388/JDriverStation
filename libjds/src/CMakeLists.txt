@@ -11,7 +11,11 @@ add_library(jds
         main/jni/robot_status.c
         main/jni/robot_comm.c
         main/jni/robot_team.c
-        main/jni/robot_joystick.c)
+        main/jni/robot_joystick.c
+        main/jni/robot_events.c
+        main/jni/event_objects.c
+        main/jni/jni_except.c
+        main/jni/jni_objects.c)
 
 find_package(libds REQUIRED)
 

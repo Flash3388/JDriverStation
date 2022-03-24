@@ -99,8 +99,7 @@ public class Main {
         ComputerMonitor computerMonitor = new ComputerMonitor(computerStatusContainer);
         services.add(computerMonitor.createService(executorService, ()-> Time.milliseconds(50)));
 
-        com.flash3388.frc.ds.api.DriverStation driverStation = com.flash3388.frc.ds.api.DriverStation.getInstance();
-        DriverStationControlImpl driverStationControl = new DriverStationControlImpl(driverStation, configuration);
+        DriverStationControlImpl driverStationControl = new DriverStationControlImpl();
         services.add(new PeriodicTaskService(executorService, ()->Time.milliseconds(50),
                 new UpdateTask(driverStationControl)));
 
@@ -183,7 +182,7 @@ public class Main {
     private static void loadNatives() throws Exception {
         loadSdlNatives();
         loadNativesFromJar(ComputerStatus.class, Collections.singleton("libcomp"));
-        loadNativesFromJar(com.flash3388.frc.ds.api.DriverStation.class, Collections.singleton("libjds"));
+        loadNativesFromJar(com.flash3388.frc.ds.api.DriverStationJNI.class, Collections.singleton("libjds"));
     }
 
     private static void loadNativesFromJar(Class<?> classInJar, Collection<String> libs) throws Exception {

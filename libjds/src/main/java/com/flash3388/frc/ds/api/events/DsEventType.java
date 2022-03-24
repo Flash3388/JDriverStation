@@ -1,0 +1,10 @@
+package com.flash3388.frc.ds.api.events;
+
+public enum DsEventType {
+    FMS_COMMS_CHANGED,
+    RADIO_COMMS_CHANGED,
+    JOYSTICK_COUNT_CHANGED,
+    NETCONSOLE_NEW_MESSAGE,
+    STATUS_STRING_CHANGED,
+    ROBOT_STATE_CHANGED,
+}

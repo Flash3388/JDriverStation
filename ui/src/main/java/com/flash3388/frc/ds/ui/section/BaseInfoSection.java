@@ -28,7 +28,6 @@ public class BaseInfoSection extends AnchorPane {
     private final Rectangle mCommunicationBox;
     private final Rectangle mCodeBox;
     private final Rectangle mJoystickBox;
-    private final Label mStatusTextLabel;
 
     public BaseInfoSection(Stage owner, DependencyHolder dependencyHolder) {
         final double TOTAL_WIDTH = 200.0;
@@ -40,13 +39,9 @@ public class BaseInfoSection extends AnchorPane {
         teamNumberLabel.setFont(teamNumberFont);
         Label teamNumberValueLabel = new Label("0000");
         teamNumberValueLabel.setFont(teamNumberFont);
-        driverStationControl.teamNumberProperty().addListener((obs, o, n)-> {
-            teamNumberValueLabel.setText(String.valueOf(n.intValue()));
-        });
-        teamNumberValueLabel.setText(String.valueOf(driverStationControl.teamNumberProperty().get()));
+        teamNumberValueLabel.textProperty().bind(driverStationControl.teamNumberProperty().asString());
 
         HBox voltageLevelBox = new HBox();
-
         mVoltageProgress = new ProgressBar(0.0);
         mVoltageProgress.setPrefWidth(50);
         mVoltageProgress.setPrefHeight(65);
@@ -85,6 +80,9 @@ public class BaseInfoSection extends AnchorPane {
         mJoystickBox.setHeight(20);
         setRectangle(mJoystickBox, false);
         Label joystickLabel = new Label("Joystick");
+        driverStationControl.joystickCountProperty().addListener((obs, o, n)-> {
+            setRectangle(mJoystickBox, n.intValue() > 0);
+        });
 
         GridPane statusPane = new GridPane();
 
@@ -99,16 +97,9 @@ public class BaseInfoSection extends AnchorPane {
         statusPane.add(mJoystickBox, 0, 2);
         statusPane.add(joystickLabel, 1, 2);
 
-        mStatusTextLabel = new Label("----");
-        mStatusTextLabel.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, 12));
-        driverStationControl.controlModeProperty().addListener((obs, o, n)-> {
-            setStatusText(n, driverStationControl.enabledProperty().get());
-        });
-        driverStationControl.enabledProperty().addListener((obs, o, n)-> {
-            setStatusText(driverStationControl.controlModeProperty().getValue(), n);
-        });
-        setStatusText(driverStationControl.controlModeProperty().getValue(),
-                driverStationControl.enabledProperty().get());
+        Label statusTextLabel = new Label("----");
+        statusTextLabel.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, 12));
+        statusTextLabel.textProperty().bind(driverStationControl.statusStringProperty());
 
         GridPane topPane = new GridPane();
         topPane.setGridLinesVisible(false);
@@ -121,7 +112,7 @@ public class BaseInfoSection extends AnchorPane {
         topPane.add(voltageLevelBox, 0, 1);
         topPane.add(mVoltageLabel, 1, 1);
         topPane.add(statusPane, 0, 2, 2, 1);
-        topPane.add(mStatusTextLabel, 0, 3, 2, 1);
+        topPane.add(statusTextLabel, 0, 3, 2, 1);
 
         FlowPane root = new FlowPane();
         root.setPrefWidth(TOTAL_WIDTH);
@@ -135,22 +126,16 @@ public class BaseInfoSection extends AnchorPane {
     }
 
     private void setRectangle(Rectangle rectangle, boolean value) {
-        rectangle.setFill(value ? Color.GREEN : Color.RED);
+        rectangle.setFill(value ? Color.GREENYELLOW : Color.RED);
     }
 
     private void setVoltage(double voltage, double maxVoltage) {
-        if (voltage < 0) {
+        if (voltage >= 0) {
             mVoltageLabel.setText(String.format("%02.2f", voltage));
             mVoltageProgress.setProgress(voltage / maxVoltage);
         } else {
             mVoltageLabel.setText("--.--");
             mVoltageProgress.setProgress(0.0);
         }
-    }
-
-    private void setStatusText(RobotControlMode controlMode, boolean isEnabled) {
-        mStatusTextLabel.setText(String.format("%s %s",
-                controlMode.displayName(),
-                isEnabled ? "Enabled" : "Disabled"));
     }
 }

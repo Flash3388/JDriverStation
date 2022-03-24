@@ -5,28 +5,28 @@
 #include <LibDS.h>
 
 
-JNIEXPORT jint JNICALL
+JNIEXPORT jboolean JNICALL
 Java_com_flash3388_frc_ds_api_DriverStationJNI_hasRobotCode
         (JNIEnv *env, jclass obj) {
 
     return DS_GetRobotCode();
 }
 
-JNIEXPORT jint JNICALL
+JNIEXPORT jboolean JNICALL
 Java_com_flash3388_frc_ds_api_DriverStationJNI_isConnectedToFms
         (JNIEnv *env, jclass obj) {
 
     return DS_GetFMSCommunications();
 }
 
-JNIEXPORT jint JNICALL
+JNIEXPORT jboolean JNICALL
 Java_com_flash3388_frc_ds_api_DriverStationJNI_isConnectedToRobot
         (JNIEnv *env, jclass obj) {
 
     return DS_GetRobotCommunications();
 }
 
-JNIEXPORT jint JNICALL
+JNIEXPORT jboolean JNICALL
 Java_com_flash3388_frc_ds_api_DriverStationJNI_isConnectedToRadio
         (JNIEnv *env, jclass obj) {
 
@@ -55,7 +55,7 @@ Java_com_flash3388_frc_ds_api_DriverStationJNI_getDiskUsage
 }
 
 JNIEXPORT jint JNICALL
-Java_com_flash3388_frc_ds_api_DriverStationJNI_getCanUsageUsage
+Java_com_flash3388_frc_ds_api_DriverStationJNI_getCanUsage
         (JNIEnv *env, jclass obj) {
 
     return DS_GetRobotCANUtilization();

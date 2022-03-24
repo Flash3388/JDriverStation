@@ -40,14 +40,4 @@ public enum RobotControlMode {
 
     public abstract String displayName();
     public abstract DsControlMode toDsControlMode();
-
-    public static RobotControlMode fromDsControlMode(DsControlMode dsControlMode) {
-        for (RobotControlMode robotControlMode : values()) {
-            if (robotControlMode.toDsControlMode() == dsControlMode) {
-                return robotControlMode;
-            }
-        }
-
-        throw new EnumConstantNotPresentException(RobotControlMode.class, dsControlMode.name());
-    }
 }
