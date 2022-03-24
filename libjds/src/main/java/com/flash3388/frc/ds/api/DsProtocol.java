@@ -4,7 +4,7 @@ public enum DsProtocol {
     FRC2014(0),
     FRC2015(1),
     FRC2016(2),
-    FRC2018(3);
+    FRC2020(3);
 
     private final int mValue;
 

@@ -1,35 +1,56 @@
 package com.flash3388.frc.ds.computer;
 
+import com.castle.time.Time;
 import com.flash3388.frc.ds.comp.BatteryState;
 import com.flash3388.frc.ds.comp.ComputerStatus;
 import com.flash3388.frc.ds.comp.ChargeState;
 import com.flash3388.frc.ds.comp.NativeException;
+import sdl2.PowerInfo;
+import sdl2.PowerState;
+import sdl2.SDL;
+import sdl2.SDLEvents;
+import sdl2.SDLPower;
+import sdl2.events.Event;
+
+import java.util.function.Supplier;
 
 public class UpdateTask implements Runnable {
 
-    private final ComputerStatus mComputerStatus;
     private final ComputerStatusContainer mComputerStatusContainer;
+    private final Time mRunInterval;
 
-    public UpdateTask(ComputerStatus computerStatus, ComputerStatusContainer computerStatusContainer) {
-        mComputerStatus = computerStatus;
+    public UpdateTask(ComputerStatusContainer computerStatusContainer, Time runInterval) {
         mComputerStatusContainer = computerStatusContainer;
+        mRunInterval = runInterval;
     }
 
     @Override
     public void run() {
+        SDL.init(SDL.INIT_JOYSTICK);
         try {
-            BatteryState batteryState = mComputerStatus.getBatteryState();
-            mComputerStatusContainer.levelProperty().set(batteryState.getChargeLevel());
-            mComputerStatusContainer.isChargingProperty().set(
-                    batteryState.getChargeState() != ChargeState.POWER_DISCHARGING &&
-                            batteryState.getChargeState() != ChargeState.POWER_UNKNOWN);
-        } catch (NativeException e) {
-        }
+            while (!Thread.interrupted()) {
+                pollUpdate();
 
+                try {
+                    Thread.sleep((long) mRunInterval.valueAsMillis());
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+        } finally {
+            SDL.quit();
+        }
+    }
+
+    private void pollUpdate() {
         try {
-            double cpuUsage = mComputerStatus.getCpuUsage();
-            mComputerStatusContainer.usageProperty().set(cpuUsage);
-        } catch (NativeException e) {
+            PowerInfo powerInfo = SDLPower.getPowerInfo();
+            mComputerStatusContainer.levelProperty().set(powerInfo.getPercentage() / 100.0);
+            mComputerStatusContainer.isChargingProperty().set(
+                    powerInfo.getState() == PowerState.CHARGING ||
+                            powerInfo.getState() == PowerState.CHARGING);
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 }

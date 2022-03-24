@@ -11,6 +11,8 @@ module driverstation.main {
     requires flashlib;
     requires java.logging;
     requires java.sql;
+    requires jsdl2;
+    requires jsdl2.jni;
 
     requires driverstation.libcomp;
     requires driverstation.api;

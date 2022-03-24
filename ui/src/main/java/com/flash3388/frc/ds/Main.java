@@ -6,6 +6,8 @@ import com.castle.code.loader.NativeLibraryLoader;
 import com.castle.code.loader.TempNativeLibraryLoader;
 import com.castle.concurrent.service.Service;
 import com.castle.nio.PathMatching;
+import com.castle.nio.temp.TempPath;
+import com.castle.nio.temp.TempPathGenerator;
 import com.castle.nio.zip.ArchivedNativeLibraryFinder;
 import com.castle.nio.zip.OpenZip;
 import com.castle.nio.zip.Zip;
@@ -15,6 +17,7 @@ import com.castle.time.SystemMillisClock;
 import com.castle.time.Time;
 import com.castle.util.closeables.Closer;
 import com.castle.util.java.JavaSources;
+import com.castle.util.os.OperatingSystem;
 import com.castle.util.regex.Patterns;
 import com.flash3388.flashlib.util.logging.LogLevel;
 import com.flash3388.flashlib.util.logging.LoggerBuilder;
@@ -37,9 +40,14 @@ import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import net.sourceforge.argparse4j.inf.Namespace;
 import org.slf4j.Logger;
+import sdl2.SDL;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +62,8 @@ import java.util.regex.Pattern;
 import static net.sourceforge.argparse4j.impl.Arguments.storeTrue;
 
 public class Main {
+
+    private static final String SDLJNI_LIBNAME = "libsdl2_jni";
 
     public static void main(String[] args) throws Exception {
         ProgramOptions programOptions = handleArguments(args);
@@ -81,14 +91,13 @@ public class Main {
         Closer closer = Closer.empty();
         CountDownLatch runLatch = new CountDownLatch(1);
 
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(5);
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(8);
         closer.add(executorService::shutdownNow);
 
         Collection<Service> services = new ArrayList<>();
 
-        ComputerStatus computerStatus = new ComputerStatus();
         ComputerStatusContainer computerStatusContainer = new ComputerStatusContainer();
-        ComputerMonitor computerMonitor = new ComputerMonitor(computerStatus, computerStatusContainer);
+        ComputerMonitor computerMonitor = new ComputerMonitor(computerStatusContainer);
         services.add(computerMonitor.createService(executorService, ()-> Time.milliseconds(50)));
 
         com.flash3388.frc.ds.api.DriverStation driverStation = com.flash3388.frc.ds.api.DriverStation.getInstance();
@@ -173,26 +182,83 @@ public class Main {
     }
 
     private static void loadNatives() throws Exception {
-        loadNativesFromJar(ComputerStatus.class, "comp", Collections.singleton("libcomp"));
-        loadNativesFromJar(com.flash3388.frc.ds.api.DriverStation.class, "jds", Collections.singleton("libjds"));
+        loadSdlNatives();
+        loadNativesFromJar(ComputerStatus.class, Collections.singleton("libcomp"));
+        loadNativesFromJar(com.flash3388.frc.ds.api.DriverStation.class, Collections.singleton("libjds"));
     }
 
-    private static void loadNativesFromJar(Class<?> classInJar, String prefixPackage, Collection<String> libs) throws Exception {
+    private static void loadNativesFromJar(Class<?> classInJar, Collection<String> libs) throws Exception {
         Zip zip = JavaSources.containingJar(classInJar);
 
         try (OpenZip openZip = zip.open()) {
             Path basePath = openZip.pathFinder().findAll(
-                    Patterns.wrapWithWildcards(prefixPackage),
+                    Patterns.wrapWithWildcards("natives/jni"),
                     PathMatching.directoryMatcher())
                     .iterator().next();
 
             NativeLibraryLoader nativeLibraryLoader = new TempNativeLibraryLoader();
-            NativeLibraryFinder nativeLibraryFinder = new ArchivedNativeLibraryFinder(zip, basePath);
+            NativeLibraryFinder nativeLibraryFinder = new OurNativeLibraryFinder(zip, basePath);
 
             for (String lib : libs) {
                 NativeLibrary nativeLibrary = nativeLibraryFinder.find(lib);
                 nativeLibraryLoader.load(nativeLibrary);
             }
+        }
+    }
+
+    private static void loadSdlNatives() {
+        if (com.castle.util.os.System.operatingSystem() == OperatingSystem.Windows) {
+            // windows has some problem with loading dependencies
+            java.lang.System.loadLibrary("KERNEL32");
+            java.lang.System.loadLibrary("msvcrt");
+            java.lang.System.loadLibrary("SDL2");
+        }
+
+        try {
+            loadSdl();
+        } catch (Exception e) {
+            throw new Error("Error loading natives for jsdl2", e);
+        }
+    }
+
+    private static void loadSdl() throws Exception {
+        switch (com.castle.util.os.System.operatingSystem()) {
+            case Windows:
+                Path sdlExtractPath = Paths.get(java.lang.System.getProperty("user.dir"))
+                        .resolve(SDLJNI_LIBNAME + ".dll");
+                if (!Files.exists(sdlExtractPath)) {
+                    // not extracted
+                    extractSdl(sdlExtractPath);
+                }
+
+                java.lang.System.load(sdlExtractPath.toAbsolutePath().toString());
+                break;
+            case Linux:
+                try (TempPath tempPath = new TempPathGenerator().generateFile()) {
+                    extractSdl(tempPath.originalPath());
+                    java.lang.System.load(tempPath.originalPath().toAbsolutePath().toString());
+                }
+                break;
+            default:
+                throw new Error("Current operating system isn't support by jsdl2");
+        }
+    }
+
+    private static void extractSdl(Path destination) throws IOException {
+        String libPath;
+        switch (com.castle.util.os.System.operatingSystem()) {
+            case Windows:
+                libPath = "/" + SDLJNI_LIBNAME + ".dll";
+                break;
+            case Linux:
+                libPath = "/" + SDLJNI_LIBNAME + ".so";
+                break;
+            default:
+                throw new UnsupportedOperationException();
+        }
+
+        try (InputStream inputStream = Main.class.getResourceAsStream(libPath)) {
+            Files.copy(inputStream, destination, StandardCopyOption.REPLACE_EXISTING);
         }
     }
 }

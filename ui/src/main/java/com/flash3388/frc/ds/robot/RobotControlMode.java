@@ -25,17 +25,6 @@ public enum RobotControlMode {
             return DsControlMode.AUTONOMOUS;
         }
     },
-    PRACTICE {
-        @Override
-        public String displayName() {
-            return "Practice";
-        }
-
-        @Override
-        public DsControlMode toDsControlMode() {
-            return DsControlMode.TEST;
-        }
-    },
     TEST {
         @Override
         public String displayName() {

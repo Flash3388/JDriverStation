@@ -7,6 +7,10 @@ apply from: rootProject.file('dependencies.gradle')
 
 sourceCompatibility = JavaVersion.VERSION_11
 
+configurations {
+    compileExternal
+    implementation.extendsFrom compileExternal
+}
 
 dependencies {
     implementation project(':libcomp')
@@ -19,9 +23,20 @@ dependencies {
     implementation slf4jApi()
     implementation controlfx()
 
+    implementation 'com.github.tomtzook:jsdl2:0.1.0'
+    compileExternal group: 'com.github.tomtzook', name: 'jsdl2-jni', version: '0.1.0', classifier: 'linux-amd64'
+
     testImplementation junit()
     testImplementation mockito()
     testImplementation hamcrest()
+}
+
+jar {
+    from {
+        configurations.compileExternal.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
 }
 
 test {
@@ -40,7 +55,8 @@ javafx {
 }
 
 application {
-    mainClassName = 'driverstation.main/com.flash3388.frc.ds.Main'
+    mainModule = 'driverstation.main'
+    mainClassName = 'com.flash3388.frc.ds.Main'
     applicationName = 'JDriverStation'
 }
 
@@ -49,6 +65,7 @@ startScripts {
 }
 
 run {
+    main = "$moduleName/com.flash3388.frc.ds.Main"
     jvmArgs '-Djdk.gtk.version=2'
     args '--debug', '--nofiles'
 }

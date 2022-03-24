@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id "io.github.tomtzook.gradle-cmake" version "1.0.0"
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -12,18 +13,34 @@ dependencies {
 
 }
 
+def compileMachineTargets = [machines.host]
+
 jar {
     archiveBaseName.set('comp')
 
-    from (file("${project.buildDir.absolutePath}/cmake/libcomp.so")) {
-        into "${archiveBaseName.get()}/linux/amd64"
+    from (cmake.outputDir.map {
+        return it.asFileTree.matching {
+            include '**/*.dll'
+            include '**/*.so'
+            exclude '**/CMakeFiles/**'
+
+        }
+    }) {
+        into 'natives'
     }
 
     archiveFileName.set("${archiveBaseName.get()}.${archiveExtension.get()}")
     destinationDirectory.set(project.buildDir)
 }
 
-apply from: rootProject.file('cmake.gradle')
+cmake {
+    targets {
+        jni {
+            cmakeLists.set(file('src/CMakeLists.txt'))
+            targetMachines.addAll(compileMachineTargets)
+        }
+    }
+}
 
-tasks.clean.dependsOn tasks.deleteBuildDirectory
-tasks.jar.dependsOn tasks.buildNatives
+tasks.clean.dependsOn tasks.cmakeClean
+tasks.jar.dependsOn tasks.cmakeBuild

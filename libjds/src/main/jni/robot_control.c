@@ -110,7 +110,7 @@ Java_com_flash3388_frc_ds_api_DriverStationJNI_configureProtocol
             ds_protocol = DS_GetProtocolFRC_2016();
             break;
         case 3:
-            ds_protocol = DS_GetProtocolFRC_2018();
+            ds_protocol = DS_GetProtocolFRC_2020();
             break;
     }
 
