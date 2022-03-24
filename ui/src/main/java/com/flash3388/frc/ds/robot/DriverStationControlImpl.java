@@ -1,5 +1,7 @@
 package com.flash3388.frc.ds.robot;
 
+import com.flash3388.frc.ds.DriverStation;
+import com.flash3388.frc.ds.api.DriverStationJNI;
 import com.flash3388.frc.ds.api.DsControlMode;
 import com.flash3388.frc.ds.api.DsProtocol;
 import javafx.beans.property.BooleanProperty;
@@ -155,36 +157,37 @@ public class DriverStationControlImpl implements DriverStationControl {
 
     @Override
     public void rebootRobot() {
-
+        DriverStationJNI.rebootRobot();
     }
 
     @Override
     public void restartCode() {
-
+        DriverStationJNI.restartRobotCode();
     }
 
     @Override
     public void setEnabled(boolean enabled) {
-
+        DriverStationJNI.setRobotEnabled(enabled);
     }
 
     @Override
     public void setControlMode(DsControlMode controlMode) {
-
+        DriverStationJNI.setControlMode(controlMode.value());
     }
 
     @Override
     public void setTeamNumber(int teamNumber) {
-
+        DriverStationJNI.setTeamNumber(teamNumber);
     }
 
     @Override
     public void setTeamStation(TeamStation teamStation) {
-
+        DriverStationJNI.setTeamAlliance(teamStation.getTeamAlliance().value());
+        DriverStationJNI.setTeamPosition(teamStation.getTeamPosition().value());
     }
 
     @Override
     public void setProtocol(DsProtocol protocol) {
-
+        DriverStationJNI.configureProtocol(protocol.value());
     }
 }

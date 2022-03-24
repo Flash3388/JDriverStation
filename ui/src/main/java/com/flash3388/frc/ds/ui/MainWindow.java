@@ -2,6 +2,7 @@ package com.flash3388.frc.ds.ui;
 
 import com.castle.time.Time;
 import com.flash3388.frc.ds.DependencyHolder;
+import com.flash3388.frc.ds.configuration.Configuration;
 import com.flash3388.frc.ds.ui.section.BaseInfoSection;
 import com.flash3388.frc.ds.ui.section.ControlSection;
 import com.flash3388.frc.ds.ui.section.StatusSection;
@@ -59,5 +60,9 @@ public class MainWindow extends AnchorPane implements Updatable {
     @Override
     public void update(Time timePassed) {
         mControlSection.update(timePassed);
+    }
+
+    public void loadInitialValues(DependencyHolder dependencyHolder) {
+        dependencyHolder.getDriverStationControl().setTeamNumber(3388);
     }
 }

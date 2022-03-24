@@ -42,10 +42,10 @@ public class ConnectionStatusView extends TabbedPane.ViewController {
         mDiskUsage = new Label("0.0");
         mCanUtilization = new Label("0.0");
 
-        mCpuUsage.textProperty().bind(driverStationControl.cpuUsageProperty().asString());
-        mRamUsage.textProperty().bind(driverStationControl.ramUsageProperty().asString());
-        mDiskUsage.textProperty().bind(driverStationControl.diskUsageProperty().asString());
-        mCanUtilization.textProperty().bind(driverStationControl.canUtilizationProperty().asString());
+        mCpuUsage.textProperty().bind(driverStationControl.cpuUsageProperty().asString("%.2f"));
+        mRamUsage.textProperty().bind(driverStationControl.ramUsageProperty().asString("%.2f"));
+        mDiskUsage.textProperty().bind(driverStationControl.diskUsageProperty().asString("%.2f"));
+        mCanUtilization.textProperty().bind(driverStationControl.canUtilizationProperty().asString("%.2f"));
 
         Button rebootRoborio = new Button("Reboot RoboRIO");
         rebootRoborio.setPrefSize(TOTAL_WIDTH / 2, 20);

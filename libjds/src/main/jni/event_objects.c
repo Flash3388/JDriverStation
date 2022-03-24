@@ -61,7 +61,7 @@ jobject make_robot_state_event(JNIEnv* env, DS_RobotEvent event) {
     if (NULL == class) {
         return NULL;
     }
-    jmethodID constructor = get_constructor(env, class, "(I)V");
+    jmethodID constructor = get_constructor(env, class, "(Lcom/flash3388/frc/ds/api/DsControlMode;ZZZDZDDDD)V");
     if (NULL == constructor) {
         return NULL;
     }

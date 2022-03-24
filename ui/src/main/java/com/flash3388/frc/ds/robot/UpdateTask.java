@@ -9,6 +9,7 @@ import com.flash3388.frc.ds.api.events.NetConsoleMessageEvent;
 import com.flash3388.frc.ds.api.events.RadioConnectionChangeEvent;
 import com.flash3388.frc.ds.api.events.RobotStateChangeEvent;
 import com.flash3388.frc.ds.api.events.StatusStringChangeEvent;
+import javafx.application.Platform;
 
 public class UpdateTask implements Runnable {
 
@@ -41,20 +42,22 @@ public class UpdateTask implements Runnable {
     }
 
     private void setInitialValues() {
-        mControl.joystickCountProperty().set(DriverStationJNI.getJoystickCount());
-        mControl.statusStringProperty().set(DriverStationJNI.getStatusString());
-        mControl.controlModeProperty().setValue(DsControlMode.fromValue(DriverStationJNI.getControlMode()));
-        mControl.robotConnectedProperty().set(DriverStationJNI.isConnectedToRobot());
-        mControl.robotHasCodeProperty().set(DriverStationJNI.hasRobotCode());
-        mControl.enabledProperty().set(DriverStationJNI.isRobotEnabled());
-        mControl.voltageProperty().set(DriverStationJNI.getRobotVoltage());
-        mControl.cpuUsageProperty().set(DriverStationJNI.getCpuUsage());
-        mControl.diskUsageProperty().set(DriverStationJNI.getDiskUsage());
-        mControl.ramUsageProperty().set(DriverStationJNI.getRamUsage());
-        mControl.canUtilizationProperty().set(DriverStationJNI.getCanUsage());
-        mControl.maxVoltageProperty().set(DriverStationJNI.getMaximumRobotVoltage());
-        mControl.fmsConnectedProperty().set(DriverStationJNI.isConnectedToFms());
-        mControl.radioConnectedProperty().set(DriverStationJNI.isConnectedToRadio());
+        Platform.runLater(()-> {
+            mControl.joystickCountProperty().set(DriverStationJNI.getJoystickCount());
+            mControl.statusStringProperty().set(DriverStationJNI.getStatusString());
+            mControl.controlModeProperty().setValue(DsControlMode.fromValue(DriverStationJNI.getControlMode()));
+            mControl.robotConnectedProperty().set(DriverStationJNI.isConnectedToRobot());
+            mControl.robotHasCodeProperty().set(DriverStationJNI.hasRobotCode());
+            mControl.enabledProperty().set(DriverStationJNI.isRobotEnabled());
+            mControl.voltageProperty().set(DriverStationJNI.getRobotVoltage());
+            mControl.cpuUsageProperty().set(DriverStationJNI.getCpuUsage());
+            mControl.diskUsageProperty().set(DriverStationJNI.getDiskUsage());
+            mControl.ramUsageProperty().set(DriverStationJNI.getRamUsage());
+            mControl.canUtilizationProperty().set(DriverStationJNI.getCanUsage());
+            mControl.maxVoltageProperty().set(DriverStationJNI.getMaximumRobotVoltage());
+            mControl.fmsConnectedProperty().set(DriverStationJNI.isConnectedToFms());
+            mControl.radioConnectedProperty().set(DriverStationJNI.isConnectedToRadio());
+        });
     }
 
     private void pollEvents() {
@@ -63,6 +66,10 @@ public class UpdateTask implements Runnable {
             return;
         }
 
+        Platform.runLater(()-> handleEvent(event));
+    }
+
+    private void handleEvent(DsEvent event) {
         switch (event.getType()) {
             case JOYSTICK_COUNT_CHANGED:
                 JoystickCountChangeEvent changeEvent = (JoystickCountChangeEvent) event;

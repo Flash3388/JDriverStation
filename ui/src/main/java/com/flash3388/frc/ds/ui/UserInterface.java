@@ -34,6 +34,10 @@ public class UserInterface {
         Stage stage = windowPair.getKey();
         stage.setOnCloseRequest((e) -> mShutdownTask.run());
 
+        Platform.runLater(()-> {
+            windowPair.getValue().loadInitialValues(mDependencyHolder);
+        });
+
         MainWindow mainWindow = windowPair.getValue();
         Future<?> future = mExecutorService.scheduleAtFixedRate(new UpdateTask(mainWindow, mDependencyHolder.getClock()),
                 0, 50, TimeUnit.MILLISECONDS);
